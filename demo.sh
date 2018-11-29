@@ -29,7 +29,6 @@ sleep 1
 
 # The following steps should be done by an admin user 
 vault secrets enable -version=1 kv
-#vault secrets enable -path=ssh-client-signer ssh
 vault secrets enable -path=ssh ssh
 vault auth enable userpass
 
@@ -52,19 +51,14 @@ vault write auth/userpass/users/ubuntu \
     password=newpasswd \
     policies=ssh-ubuntu-user
 
-#vault write -field=public_key ssh-client-signer/config/ca generate_signing_key=true
 vault write -field=public_key ssh/config/ca generate_signing_key=true
 
-#vault read -field=public_key ssh-client-signer/config/ca > ./trusted-user-ca-keys.pem
 vault read -field=public_key ssh/config/ca > ./trusted-user-ca-keys.pem
 
 docker build --tag sshtest .
 
 docker run -p 6061:22 -d --name sshtest sshtest
 
-#docker exec -it sshtest /bin/bash
-
-#vault write ssh-client-signer/roles/regular-role -<<"EOH"
 vault write ssh/roles/regular-role -<<"EOH"
 {
   "allow_user_certificates": true,
@@ -80,20 +74,13 @@ vault write ssh/roles/regular-role -<<"EOH"
 }
 EOH
 
-# The following needs to be replaced by new two-phase vaultssh machanism that will:
-# 1 addkey
-#   a) PREREQUISITE: vault login the user (userpass will be supported first)
-#   b) write the user's ssh key-pair to kv/users/<username>/keys
-# 2 ssh
-#   a) PREREQUISITE: vault login the user (userpass will be supported first)
-#   b) vault read the keys, sign the crt it and keep the result only in memory
-#   c) start the ssh interactive session using signed crt (the ssh server must have sshd preconfigured  to trust the ca crt)
-# 
-
 go install
 
 # In a real scenario the user wishing to ssh would perform addkey once and the ssh often (not back to back like here)
+
 # Typically, vaultssh -mode addkey is run on users pc and there is network access to the vault server
-$ vaultssh -mode ssh would be run on the bastion host, which also has access to the vault server
 $GOPATH/bin/vaultssh -mode addkey -publicKeyPath ~/.ssh/id_rsa.pub -privateKeyPath ~/.ssh/id_rsa -username ubuntu -passwd newpasswd
+
+# Typically, vaultssh -mode ssh is run on bastion host which also has network access to the vault server
+
 $GOPATH/bin/vaultssh -mode ssh -sshServerPort 6061 -username ubuntu -passwd newpasswd
