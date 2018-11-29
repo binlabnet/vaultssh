@@ -9,7 +9,7 @@
 # This self-contained demo script starts a vault server in dev mode and
 # configures it as a ca for ssh signing and sets up a userpass account with a personal secret area to store the ssh keys.
 # It then starts an ssh server which is configured to trust the vault ca.
-# Next, it builds snd launches the vaultssh client that starts an interactive cert based ssh session.
+# Next, it builds and launches the vaultssh client that starts an interactive cert based ssh session.
 
 if [ "${GOPATH}" = "" ]; then
     echo "Please set the GOPATH environment variable; can't build vaultssh"
