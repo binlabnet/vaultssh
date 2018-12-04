@@ -45,7 +45,7 @@ func (vsConfig *VSConfig) StartSessionAux() (err error) {
 	}
 
 	if err := session.RequestPty(vsConfig.GetTermType(), vsConfig.GetTermRows(), vsConfig.GetTermCols(), terminalModes); err != nil {
-		msg := fmt.Sprint("request for pseudo terminal failed: %v\n", err)
+		msg := fmt.Sprintf("request for pseudo terminal failed: %v\n", err)
 		log.Printf(msg)
 		return err
 	}

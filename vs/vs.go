@@ -2,7 +2,12 @@ package vs
 
 import (
 	"flag"
+	"fmt"
+	"errors"
+	"log"
+	"os"
 	"github.com/hashicorp/vault/api"
+	"net/url"
 )
 
 type (
@@ -47,8 +52,29 @@ func (vsConfig *VSConfig) GetVaultAddress() string {
 	return vsConfig.vaultAddress
 }
 
-func (vsConfig *VSConfig) SetVaultAddress(addr string) {
+func (vsConfig *VSConfig) SetVaultAddress(addr string) (err error) {
+	u, err := url.ParseRequestURI(addr)
+	if err != nil {
+		return err
+	}
+
+	if u.Scheme != "http" && u.Scheme != "https" {
+		msg := fmt.Sprintf("Invalid vaultAddress scheme \"%s\"; it must be http or https", u.Scheme)
+		err = errors.New(msg)
+		return err
+	}
+	if u.Hostname() == "" {
+		msg := fmt.Sprintf("Invalid vaultAddress hostname" )
+		err = errors.New(msg)
+		return err
+	}
+	if u.Port() == "" {
+		msg := fmt.Sprintf("Invalid vaultAddress port" )
+		err = errors.New(msg)
+		return err
+	}
 	vsConfig.vaultAddress = addr
+	return err
 }
 
 func (vsConfig *VSConfig) GetPublicKeyPath() string {
@@ -175,24 +201,43 @@ func (vsConfig *VSConfig) StartSession() (err error) {
 	return vsConfig.StartSessionAux()
 }
 
-func Init() *VSConfig {
+func InitFlags() *VSConfig {
 	var vsConfig VSConfig
 
-	flag.StringVar(&vsConfig.signingRole, "signingRole", "regular-role", "ssh client signing role")
-	flag.StringVar(&vsConfig.mode, "mode", ADDKEY, "one of: addkey | ssh")
-	flag.StringVar(&vsConfig.vaultAddress, "vaultAddress", "http://localhost:8200", "vault address")
-	flag.StringVar(&vsConfig.publicKeyPath, "publicKeyPath", "", "path to ssh public key file")
-	flag.StringVar(&vsConfig.privateKeyPath, "privateKeyPath", "", "path to ssh private key file")
-	flag.StringVar(&vsConfig.sshServerHost, "sshServerHost", "0.0.0.0", "hostname to connect for ssh seesion")
-	flag.StringVar(&vsConfig.username, "username", "ubuntu", "username for vault auth")
-	flag.StringVar(&vsConfig.passwd, "passwd", "", "password for vault auth (will prompt if empty)")
-	flag.StringVar(&vsConfig.sshUsername, "sshUsername", "ubuntu", "username for ssh session")
-	flag.StringVar(&vsConfig.termType, "termType", "xterm", "terminal type for session session")
-	flag.IntVar(&vsConfig.sshServerPort, "sshServerPort", 22, "port to connect for ssh session")
-	flag.IntVar(&vsConfig.termRows, "termRows", 40, "numbr of rows in terminal")
-	flag.IntVar(&vsConfig.termCols, "termCols", 80, "numbr of columns in terminal")
+	signingRole := flag.String("signingRole", "regular-role", "ssh client signing role")
+	mode := flag.String("mode", SSH, "one of: addkey | ssh")
+	vaultAddress := flag.String("vaultAddress", "http://localhost:8200", "vault address")
+	publicKeyPath := flag.String("publicKeyPath", "", "path to ssh public key file")
+	privateKeyPath := flag.String("privateKeyPath", "", "path to ssh private key file")
+	sshServerHost := flag.String("sshServerHost", "0.0.0.0", "hostname to connect for ssh seesion")
+	username := flag.String("username", "ubuntu", "username for vault auth")
+	passwd := flag.String("passwd", "", "password for vault auth (will prompt if empty)")
+	sshUsername := flag.String("sshUsername", "ubuntu", "username for ssh session")
+	termType := flag.String("termType", "xterm", "terminal type for session session")
+	sshServerPort := flag.Int("sshServerPort", 22, "port to connect for ssh session")
+	termRows := flag.Int("termRows", 40, "numbr of rows in terminal")
+	termCols := flag.Int("termCols", 80, "numbr of columns in terminal")
 
 	flag.Parse()
+
+	// The reason we assign the fields using the Set API is to perform validations there
+	vsConfig.SetSigningRole(*signingRole)
+	vsConfig.SetMode(*mode)
+	err := vsConfig.SetVaultAddress(*vaultAddress)
+	if err != nil {
+		log.Printf("Bad value for vaultAddress \"%s\"; %v\n", *vaultAddress, err)
+		os.Exit(1)
+	}
+	vsConfig.SetPublicKeyPath(*publicKeyPath)
+	vsConfig.SetPrivateKeyPath(*privateKeyPath)
+	vsConfig.SetSshServerHost(*sshServerHost)
+	vsConfig.SetUsername(*username)
+	vsConfig.SetPasswd(*passwd)
+	vsConfig.SetSshUsername(*sshUsername)
+	vsConfig.SetTermType(*termType)
+	vsConfig.SetSshServerPort(*sshServerPort)
+	vsConfig.SetTermRows(*termRows)
+	vsConfig.SetTermCols(*termCols)
 
 	return &vsConfig
 }
