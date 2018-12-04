@@ -1,6 +1,6 @@
 package vs
 
-func (vsConfig *VSConfig) AddKeyPair() (err error) {
+func (vsConfig *VSConfig) AddKeyPairAux() (err error) {
 	err = vsConfig.VaultLogin()
 	if err != nil {
 		return err

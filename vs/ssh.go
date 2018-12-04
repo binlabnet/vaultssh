@@ -9,14 +9,14 @@ import (
 	"strings"
 )
 
-func (vsConfig *VSConfig) StartSession() (err error) {
+func (vsConfig *VSConfig) StartSessionAux() (err error) {
 	err = vsConfig.VaultLogin()
 	if err != nil {
 		return err
 	}
 
 	clientConfig, err := vsConfig.getSignedCertConfig()
-	addr := fmt.Sprintf("%s:%d", vsConfig.SshServerHost, vsConfig.SshServerPort)
+	addr := fmt.Sprintf("%s:%d", vsConfig.GetSshServerHost(), vsConfig.GetSshServerPort())
 
 	conn, err := ssh.Dial("tcp", addr, clientConfig)
 	if err != nil {
@@ -44,8 +44,8 @@ func (vsConfig *VSConfig) StartSession() (err error) {
 		ssh.TTY_OP_OSPEED: 14400,
 	}
 
-	if err := session.RequestPty(vsConfig.TermType, vsConfig.TermRows, vsConfig.TermCols, terminalModes); err != nil {
-		msg := fmt.Sprint("request for pseudo terminal failed: %v\n", err)
+	if err := session.RequestPty(vsConfig.GetTermType(), vsConfig.GetTermRows(), vsConfig.GetTermCols(), terminalModes); err != nil {
+		msg := fmt.Sprintf("request for pseudo terminal failed: %v\n", err)
 		log.Printf(msg)
 		return err
 	}
@@ -101,7 +101,7 @@ func (vsConfig *VSConfig) getSignedCertConfig() (clientConfig *ssh.ClientConfig,
 	}
 
 	clientConfig = &ssh.ClientConfig{
-		User:            vsConfig.SshUsername,
+		User:            vsConfig.GetSshUsername(),
 		Auth:            []ssh.AuthMethod{ssh.PublicKeys(ucertSigner)},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
