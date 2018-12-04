@@ -6,9 +6,9 @@ import (
 	"log"
 )
 
-func (vsConfig *VSConfig) SignPubKey(pubkey string) (signedCrt string, err error) {
+func (vsConfig *VSConfig) SignPubKeyAux(pubkey string) (signedCrt string, err error) {
 
-	ssh := vsConfig.State.VaultClient.SSH()
+	ssh := vsConfig.VaultClient.SSH()
 
 	data := make(map[string]interface{})
 	data["public_key"] = pubkey
@@ -37,7 +37,7 @@ func (vsConfig *VSConfig) SignPubKey(pubkey string) (signedCrt string, err error
 func (vsConfig *VSConfig) VaultReadSSHKey() (pubkey, privkey string, err error) {
 	path := fmt.Sprintf("kv/users/%s/keys/ssh", vsConfig.Username)
 
-	s, err := vsConfig.State.VaultClient.Logical().Read(path)
+	s, err := vsConfig.VaultClient.Logical().Read(path)
 	if err != nil {
 		log.Printf("Error reading ssh key pair to path: %s\n", path)
 		return pubkey, privkey, err
@@ -53,16 +53,16 @@ func (vsConfig *VSConfig) VaultWriteSSHKey() (err error) {
 
 	secret := make(map[string]interface{})
 
-	secret["key"] = vsConfig.State.PrivateKey
-	secret["crt"] = vsConfig.State.PublicKey
-	_, err = vsConfig.State.VaultClient.Logical().Write(path, secret)
+	secret["key"] = vsConfig.PrivateKey
+	secret["crt"] = vsConfig.PublicKey
+	_, err = vsConfig.VaultClient.Logical().Write(path, secret)
 	if err != nil {
 		log.Printf("Error writing key pair to path: %s\n", path)
 		return err
 	}
 
 	// confirmation
-	s, err := vsConfig.State.VaultClient.Logical().Read(path)
+	s, err := vsConfig.VaultClient.Logical().Read(path)
 	if err != nil {
 		log.Printf("Error reading ssh key pair to path: %s\n", path)
 		return err
@@ -82,19 +82,19 @@ func (vsConfig *VSConfig) VaultLogin() (err error) {
 		return err
 	}
 
-	vsConfig.State.VaultClient = client
+	vsConfig.VaultClient = client
 
 	path := fmt.Sprintf("auth/userpass/login/%s", vsConfig.Username)
 
-	auth, err := vsConfig.State.VaultClient.Logical().Write(path, map[string]interface{}{
+	auth, err := vsConfig.VaultClient.Logical().Write(path, map[string]interface{}{
 		"password": vsConfig.Passwd,
 	})
 	if err != nil {
 		return err
 	}
 
-	vsConfig.State.VaultToken = auth.Auth.ClientToken
-	vsConfig.State.VaultClient.SetToken(vsConfig.State.VaultToken)
+	vsConfig.VaultToken = auth.Auth.ClientToken
+	vsConfig.VaultClient.SetToken(vsConfig.VaultToken)
 
 	return err
 }

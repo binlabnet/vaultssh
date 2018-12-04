@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func (vsConfig *VSConfig) StartSession() (err error) {
+func (vsConfig *VSConfig) StartSessionAux() (err error) {
 	err = vsConfig.VaultLogin()
 	if err != nil {
 		return err
