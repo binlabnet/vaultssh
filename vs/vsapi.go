@@ -1,5 +1,7 @@
 package vs
 
+//go:generate mockgen -source=vsapi.go -package=github.com/richrd-mauri/vaultssh/vs -destination=vsapi_mock.go
+
 import (
 	"github.com/hashicorp/vault/api"
 )
@@ -11,59 +13,59 @@ const (
 
 type (
 	VsApi interface {
-		GetSigningRole() (string)
+		GetSigningRole() string
 		SetSigningRole(string)
 
-		GetMode() (string)
+		GetMode() string
 		SetMode(string)
 
-		GetVaultAddress() (string)
+		GetVaultAddress() string
 		SetVaultAddress(string)
 
-		GetPublicKeyPath() (string)
+		GetPublicKeyPath() string
 		SetPublicKeyPath(string)
 
-		GetPrivateKeyPath() (string)
+		GetPrivateKeyPath() string
 		SetPrivateKeyPath(string)
 
-	        GetSshServerHost() (string)
-	        SetSshServerHost(string)
+		GetSshServerHost() string
+		SetSshServerHost(string)
 
-	        GetSshServerPort() (int)
-	        SetSshServerPort(int)
+		GetSshServerPort() int
+		SetSshServerPort(int)
 
-	        GetTermType() (string)
-	        SetTermType(string)
+		GetTermType() string
+		SetTermType(string)
 
-	        GetTermRows() (int)
-	        SetTermRows(int)
+		GetTermRows() int
+		SetTermRows(int)
 
-	        GetTermCols() (int)
-	        SetTermCols(int)
+		GetTermCols() int
+		SetTermCols(int)
 
-	        GetUsername() (string)
-	        SetUsername(string)
+		GetUsername() string
+		SetUsername(string)
 
-	        GetSshUsername() (string)
-	        SetSshUsername(string)
+		GetSshUsername() string
+		SetSshUsername(string)
 
-		GetVaultClient() (*api.Client)
+		GetVaultClient() *api.Client
 		SetVaultClient(*api.Client)
 
-		GetVaultToken() (string)
+		GetVaultToken() string
 		SetVaultToken(string)
 
-		GetPasswd() (string)
+		GetPasswd() string
 		SetPasswd(string)
 
-		GetPrivateKey() (string)
+		GetPrivateKey() string
 		SetPrivateKey(string)
 
-		GetPublicKey() (string)
+		GetPublicKey() string
 		SetPublicKey(string)
 
-	        AddKeyPair() (err error)
-	        StartSession() (err error)
+		AddKeyPair() (err error)
+		StartSession() (err error)
 		SignPubKey(pubKey string) (signedCrt string, err error)
 		VaultReadSSHKey() (pubKey, privKey string, err error)
 		VaultWriteSSHKey() (err error)
@@ -95,8 +97,7 @@ func VaultLogin(vsapi VsApi) (err error) {
 	return vsapi.VaultLogin()
 }
 
-
-func GetSigningRole(vsapi VsApi) (string) {
+func GetSigningRole(vsapi VsApi) string {
 	return vsapi.GetSigningRole()
 }
 
@@ -104,7 +105,7 @@ func SetSigningRole(vsapi VsApi, role string) {
 	vsapi.SetSigningRole(role)
 }
 
-func GetMode(vsapi VsApi) (string) {
+func GetMode(vsapi VsApi) string {
 	return vsapi.GetMode()
 }
 
@@ -112,7 +113,7 @@ func SetMode(vsapi VsApi, mode string) {
 	vsapi.SetMode(mode)
 }
 
-func GetVaultAddress(vsapi VsApi) (string) {
+func GetVaultAddress(vsapi VsApi) string {
 	return vsapi.GetVaultAddress()
 }
 
@@ -120,7 +121,7 @@ func SetVaultAddress(vsapi VsApi, addr string) {
 	vsapi.SetVaultAddress(addr)
 }
 
-func GetPublicKeyPath(vsapi VsApi) (string) {
+func GetPublicKeyPath(vsapi VsApi) string {
 	return vsapi.GetPublicKeyPath()
 }
 
@@ -128,7 +129,7 @@ func SetPublicKeyPath(vsapi VsApi, keypath string) {
 	vsapi.SetPublicKeyPath(keypath)
 }
 
-func GetPrivateKeyPath(vsapi VsApi) (string) {
+func GetPrivateKeyPath(vsapi VsApi) string {
 	return vsapi.GetPrivateKeyPath()
 }
 
@@ -136,7 +137,7 @@ func SetPrivateKeyPath(vsapi VsApi, keypath string) {
 	vsapi.SetPrivateKeyPath(keypath)
 }
 
-func GetSshServerHost(vsapi VsApi) (string) {
+func GetSshServerHost(vsapi VsApi) string {
 	return vsapi.GetSshServerHost()
 }
 
@@ -144,7 +145,7 @@ func SetSshServerHost(vsapi VsApi, host string) {
 	vsapi.SetSshServerHost(host)
 }
 
-func GetSshServerPort(vsapi VsApi) (int) {
+func GetSshServerPort(vsapi VsApi) int {
 	return vsapi.GetSshServerPort()
 }
 
@@ -152,7 +153,7 @@ func SetSshServerPort(vsapi VsApi, port int) {
 	vsapi.SetSshServerPort(port)
 }
 
-func GetTermType(vsapi VsApi) (string) {
+func GetTermType(vsapi VsApi) string {
 	return vsapi.GetTermType()
 }
 
@@ -160,7 +161,7 @@ func SetTermType(vsapi VsApi, termtype string) {
 	vsapi.SetTermType(termtype)
 }
 
-func GetTermRows(vsapi VsApi) (int) {
+func GetTermRows(vsapi VsApi) int {
 	return vsapi.GetTermRows()
 }
 
@@ -168,7 +169,7 @@ func SetTermRows(vsapi VsApi, rows int) {
 	vsapi.SetTermRows(rows)
 }
 
-func GetTermCols(vsapi VsApi) (int) {
+func GetTermCols(vsapi VsApi) int {
 	return vsapi.GetTermCols()
 }
 
@@ -176,7 +177,7 @@ func SetTermCols(vsapi VsApi, cols int) {
 	vsapi.SetTermCols(cols)
 }
 
-func GetSshUsername(vsapi VsApi) (string) {
+func GetSshUsername(vsapi VsApi) string {
 	return vsapi.GetSshUsername()
 }
 
@@ -184,7 +185,7 @@ func SetSshUsername(vsapi VsApi, username string) {
 	vsapi.SetSshUsername(username)
 }
 
-func GetUsername(vsapi VsApi) (string) {
+func GetUsername(vsapi VsApi) string {
 	return vsapi.GetUsername()
 }
 
@@ -192,7 +193,7 @@ func SetUsername(vsapi VsApi, username string) {
 	vsapi.SetUsername(username)
 }
 
-func GetPasswd(vsapi VsApi) (string) {
+func GetPasswd(vsapi VsApi) string {
 	return vsapi.GetPasswd()
 }
 
@@ -200,7 +201,7 @@ func SetPasswd(vsapi VsApi, pw string) {
 	vsapi.SetPasswd(pw)
 }
 
-func GetVaultClient(vsapi VsApi) (*api.Client) {
+func GetVaultClient(vsapi VsApi) *api.Client {
 	return vsapi.GetVaultClient()
 }
 
@@ -208,7 +209,7 @@ func SetVaultClient(vsapi VsApi, client *api.Client) {
 	vsapi.SetVaultClient(client)
 }
 
-func GetVaultToken(vsapi VsApi) (string) {
+func GetVaultToken(vsapi VsApi) string {
 	return vsapi.GetVaultToken()
 }
 
@@ -216,7 +217,7 @@ func SetVaultToken(vsapi VsApi, token string) {
 	vsapi.SetVaultToken(token)
 }
 
-func GetPrivateKey(vsapi VsApi) (string) {
+func GetPrivateKey(vsapi VsApi) string {
 	return vsapi.GetPrivateKey()
 }
 
@@ -224,7 +225,7 @@ func SetPrivateKey(vsapi VsApi, privKey string) {
 	vsapi.SetPrivateKey(privKey)
 }
 
-func GetPublicKey(vsapi VsApi) (string) {
+func GetPublicKey(vsapi VsApi) string {
 	return vsapi.GetPublicKey()
 }
 

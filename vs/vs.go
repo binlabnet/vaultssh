@@ -6,28 +6,28 @@ import (
 )
 
 type (
-        VSConfig struct {
-                signingRole    string
-                mode           string
-                vaultAddress   string
-                publicKeyPath  string
-                privateKeyPath string
-                sshServerHost  string
-                sshServerPort  int
-                termType       string
-                termRows       int
-                termCols       int
-                username       string
-                sshUsername    string
-                passwd         string
-                vaultClient    *api.Client
-                vaultToken     string
-                privateKey     string
-                publicKey      string
-        }
+	VSConfig struct {
+		signingRole    string
+		mode           string
+		vaultAddress   string
+		publicKeyPath  string
+		privateKeyPath string
+		sshServerHost  string
+		sshServerPort  int
+		termType       string
+		termRows       int
+		termCols       int
+		username       string
+		sshUsername    string
+		passwd         string
+		vaultClient    *api.Client
+		vaultToken     string
+		privateKey     string
+		publicKey      string
+	}
 )
 
-func (vsConfig *VSConfig) GetSigningRole() (string) {
+func (vsConfig *VSConfig) GetSigningRole() string {
 	return vsConfig.signingRole
 }
 
@@ -35,7 +35,7 @@ func (vsConfig *VSConfig) SetSigningRole(role string) {
 	vsConfig.signingRole = role
 }
 
-func (vsConfig *VSConfig) GetMode() (string) {
+func (vsConfig *VSConfig) GetMode() string {
 	return vsConfig.mode
 }
 
@@ -43,7 +43,7 @@ func (vsConfig *VSConfig) SetMode(mode string) {
 	vsConfig.mode = mode
 }
 
-func (vsConfig *VSConfig) GetVaultAddress() (string) {
+func (vsConfig *VSConfig) GetVaultAddress() string {
 	return vsConfig.vaultAddress
 }
 
@@ -51,7 +51,7 @@ func (vsConfig *VSConfig) SetVaultAddress(addr string) {
 	vsConfig.vaultAddress = addr
 }
 
-func (vsConfig *VSConfig) GetPublicKeyPath() (string) {
+func (vsConfig *VSConfig) GetPublicKeyPath() string {
 	return vsConfig.publicKeyPath
 }
 
@@ -59,7 +59,7 @@ func (vsConfig *VSConfig) SetPublicKeyPath(keypath string) {
 	vsConfig.publicKeyPath = keypath
 }
 
-func (vsConfig *VSConfig) GetPrivateKeyPath() (string) {
+func (vsConfig *VSConfig) GetPrivateKeyPath() string {
 	return vsConfig.privateKeyPath
 }
 
@@ -67,7 +67,7 @@ func (vsConfig *VSConfig) SetPrivateKeyPath(keypath string) {
 	vsConfig.privateKeyPath = keypath
 }
 
-func (vsConfig *VSConfig) GetSshServerHost() (string) {
+func (vsConfig *VSConfig) GetSshServerHost() string {
 	return vsConfig.sshServerHost
 }
 
@@ -75,7 +75,7 @@ func (vsConfig *VSConfig) SetSshServerHost(host string) {
 	vsConfig.sshServerHost = host
 }
 
-func (vsConfig *VSConfig) GetSshServerPort() (int) {
+func (vsConfig *VSConfig) GetSshServerPort() int {
 	return vsConfig.sshServerPort
 }
 
@@ -83,7 +83,7 @@ func (vsConfig *VSConfig) SetSshServerPort(port int) {
 	vsConfig.sshServerPort = port
 }
 
-func (vsConfig *VSConfig) GetTermType() (string) {
+func (vsConfig *VSConfig) GetTermType() string {
 	return vsConfig.termType
 }
 
@@ -91,7 +91,7 @@ func (vsConfig *VSConfig) SetTermType(termtype string) {
 	vsConfig.termType = termtype
 }
 
-func (vsConfig *VSConfig) GetTermRows() (int) {
+func (vsConfig *VSConfig) GetTermRows() int {
 	return vsConfig.termRows
 }
 
@@ -99,7 +99,7 @@ func (vsConfig *VSConfig) SetTermRows(rows int) {
 	vsConfig.termRows = rows
 }
 
-func (vsConfig *VSConfig) GetTermCols() (int) {
+func (vsConfig *VSConfig) GetTermCols() int {
 	return vsConfig.termCols
 }
 
@@ -107,7 +107,7 @@ func (vsConfig *VSConfig) SetTermCols(cols int) {
 	vsConfig.termCols = cols
 }
 
-func (vsConfig *VSConfig) GetSshUsername() (string) {
+func (vsConfig *VSConfig) GetSshUsername() string {
 	return vsConfig.sshUsername
 }
 
@@ -115,7 +115,7 @@ func (vsConfig *VSConfig) SetSshUsername(username string) {
 	vsConfig.sshUsername = username
 }
 
-func (vsConfig *VSConfig) GetUsername() (string) {
+func (vsConfig *VSConfig) GetUsername() string {
 	return vsConfig.username
 }
 
@@ -123,7 +123,7 @@ func (vsConfig *VSConfig) SetUsername(username string) {
 	vsConfig.username = username
 }
 
-func (vsConfig *VSConfig) GetPasswd() (string) {
+func (vsConfig *VSConfig) GetPasswd() string {
 	return vsConfig.passwd
 }
 
@@ -131,7 +131,7 @@ func (vsConfig *VSConfig) SetPasswd(pw string) {
 	vsConfig.passwd = pw
 }
 
-func (vsConfig *VSConfig) GetVaultClient() (*api.Client) {
+func (vsConfig *VSConfig) GetVaultClient() *api.Client {
 	return vsConfig.vaultClient
 }
 
@@ -139,15 +139,15 @@ func (vsConfig *VSConfig) SetVaultClient(client *api.Client) {
 	vsConfig.vaultClient = client
 }
 
-func (vsConfig *VSConfig) GetVaultToken() (string) {
+func (vsConfig *VSConfig) GetVaultToken() string {
 	return vsConfig.vaultToken
 }
 
-func (vsConfig *VSConfig) SetVaultToken( token string) {
+func (vsConfig *VSConfig) SetVaultToken(token string) {
 	vsConfig.vaultToken = token
 }
 
-func (vsConfig *VSConfig) GetPrivateKey() (string) {
+func (vsConfig *VSConfig) GetPrivateKey() string {
 	return vsConfig.privateKey
 }
 
@@ -155,11 +155,11 @@ func (vsConfig *VSConfig) SetPrivateKey(privKey string) {
 	vsConfig.privateKey = privKey
 }
 
-func (vsConfig *VSConfig) GetPublicKey() (string) {
+func (vsConfig *VSConfig) GetPublicKey() string {
 	return vsConfig.publicKey
 }
 
-func (vsConfig *VSConfig) SetPublicKey( pubKey string) {
+func (vsConfig *VSConfig) SetPublicKey(pubKey string) {
 	vsConfig.publicKey = pubKey
 }
 
@@ -175,7 +175,7 @@ func (vsConfig *VSConfig) StartSession() (err error) {
 	return vsConfig.StartSessionAux()
 }
 
-func Init() (*VSConfig) {
+func Init() *VSConfig {
 	var vsConfig VSConfig
 
 	flag.StringVar(&vsConfig.signingRole, "signingRole", "regular-role", "ssh client signing role")
