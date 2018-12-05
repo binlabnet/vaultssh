@@ -20,7 +20,7 @@ type (
 		SetMode(string)
 
 		GetVaultAddress() string
-		SetVaultAddress(string) (error)
+		SetVaultAddress(string) error
 
 		GetPublicKeyPath() string
 		SetPublicKeyPath(string)
@@ -117,7 +117,7 @@ func GetVaultAddress(vsapi VsApi) string {
 	return vsapi.GetVaultAddress()
 }
 
-func SetVaultAddress(vsapi VsApi, addr string) (error) {
+func SetVaultAddress(vsapi VsApi, addr string) error {
 	return vsapi.SetVaultAddress(addr)
 }
 
