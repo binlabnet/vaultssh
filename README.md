@@ -68,3 +68,8 @@ Mozilla Public License, version 2.0
 * https://www.vaultproject.io/docs/secrets/ssh/signed-ssh-certificates.html
 * https://github.com/hashicorp/vault/blob/master/command/ssh.go
 * https://godoc.org/golang.org/x/crypto/ssh#example-PublicKeys
+* https://dev.to/dmigwi/mocking-methods-in-go-5fg
+* https://stackoverflow.com/questions/19167970/mock-functions-in-go
+* https://caitiem.com/2016/08/18/a-quick-guide-to-testing-in-golang/
+* https://github.com/golang/mock
+* https://github.com/cweill/gotests

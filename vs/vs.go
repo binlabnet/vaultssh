@@ -1,36 +1,36 @@
 package vs
 
 import (
+	"errors"
 	"flag"
 	"fmt"
-	"errors"
-	"log"
-	"os"
 	"github.com/hashicorp/vault/api"
+	"log"
 	"net/url"
+	"os"
 )
 
-type (
-	VSConfig struct {
-		signingRole    string
-		mode           string
-		vaultAddress   string
-		publicKeyPath  string
-		privateKeyPath string
-		sshServerHost  string
-		sshServerPort  int
-		termType       string
-		termRows       int
-		termCols       int
-		username       string
-		sshUsername    string
-		passwd         string
-		vaultClient    *api.Client
-		vaultToken     string
-		privateKey     string
-		publicKey      string
-	}
-)
+var vsConfig *VSConfig // Singleton: NewVSConfig "constructor" uses flags which can't be run > 1
+
+type VSConfig struct {
+	signingRole    string
+	mode           string
+	vaultAddress   string
+	publicKeyPath  string
+	privateKeyPath string
+	sshServerHost  string
+	sshServerPort  int
+	termType       string
+	termRows       int
+	termCols       int
+	username       string
+	sshUsername    string
+	passwd         string
+	vaultClient    *api.Client
+	vaultToken     string
+	privateKey     string
+	publicKey      string
+}
 
 func (vsConfig *VSConfig) GetSigningRole() string {
 	return vsConfig.signingRole
@@ -64,12 +64,12 @@ func (vsConfig *VSConfig) SetVaultAddress(addr string) (err error) {
 		return err
 	}
 	if u.Hostname() == "" {
-		msg := fmt.Sprintf("Invalid vaultAddress hostname" )
+		msg := fmt.Sprintf("Invalid vaultAddress hostname")
 		err = errors.New(msg)
 		return err
 	}
 	if u.Port() == "" {
-		msg := fmt.Sprintf("Invalid vaultAddress port" )
+		msg := fmt.Sprintf("Invalid vaultAddress port")
 		err = errors.New(msg)
 		return err
 	}
@@ -201,8 +201,13 @@ func (vsConfig *VSConfig) StartSession() (err error) {
 	return vsConfig.StartSessionAux()
 }
 
-func InitFlags() *VSConfig {
-	var vsConfig VSConfig
+// Really a singleton constructor as flags can't be parsed more than once
+func NewVSConfig() *VSConfig {
+	if vsConfig != nil {
+		return vsConfig
+	}
+
+	vsConfig = new(VSConfig)
 
 	signingRole := flag.String("signingRole", "regular-role", "ssh client signing role")
 	mode := flag.String("mode", SSH, "one of: addkey | ssh")
@@ -239,5 +244,5 @@ func InitFlags() *VSConfig {
 	vsConfig.SetTermRows(*termRows)
 	vsConfig.SetTermCols(*termCols)
 
-	return &vsConfig
+	return vsConfig
 }

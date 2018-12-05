@@ -9,7 +9,7 @@ import (
 )
 
 func Initialize() (vsapi VsApi) {
-	return InitFlags()
+	return NewVSConfig()
 }
 
 func Addkey(vsapi VsApi) (exitcode int) {
