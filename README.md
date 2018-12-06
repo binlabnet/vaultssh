@@ -11,7 +11,7 @@ A Vault client supporting interactive ssh sessions using signed ssh certificates
 
 ## Operation
 There are two modes of operation:
-1. addkey : user injkects his ssh keypair into Vault once for subsequent ssh access
+1. addkey : user injects his ssh keypair into Vault *once* for subsequent ssh access
 1. ssh: the user uses this mode to log into vault, sign his key and start an interactive ssh session
 
 ## Project Setup
