@@ -1,0 +1,9 @@
+language: go
+
+go:
+  - "1.11.2"
+
+services:
+  - docker
+
+script: ./demo.sh

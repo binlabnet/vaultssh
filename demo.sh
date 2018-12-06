@@ -74,7 +74,11 @@ vault write ssh/roles/regular-role -<<"EOH"
 }
 EOH
 
-go install
+BUILDTIME=$(date +%m-%d-%Y-%H:%M)
+
+go install -ldflags "-X github.com/richard-mauri/vaultssh/vs.VersionString=v0.1.0-${BUILDTIME}"
+
+go test github.com/richard-mauri/vaultssh/vs
 
 # In a real scenario the user wishing to ssh would perform addkey once and the ssh often (not back to back like here)
 

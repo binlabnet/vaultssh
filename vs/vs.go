@@ -10,7 +10,10 @@ import (
 	"os"
 )
 
-var vsConfig *VSConfig // Singleton: NewVSConfig "constructor" uses flags which can't be run > 1
+var (
+	vsConfig *VSConfig // Singleton: NewVSConfig "constructor" uses flags which can't be run > 1
+	VersionString string
+)
 
 type VSConfig struct {
 	signingRole    string
@@ -209,6 +212,7 @@ func NewVSConfig() *VSConfig {
 
 	vsConfig = new(VSConfig)
 
+	version := flag.Bool("v", false, "prints current version")
 	signingRole := flag.String("signingRole", "regular-role", "ssh client signing role")
 	mode := flag.String("mode", SSH, "one of: addkey | ssh")
 	vaultAddress := flag.String("vaultAddress", "http://localhost:8200", "vault address")
@@ -224,6 +228,11 @@ func NewVSConfig() *VSConfig {
 	termCols := flag.Int("termCols", 80, "numbr of columns in terminal")
 
 	flag.Parse()
+
+	if *version {
+		fmt.Println(VersionString)
+		os.Exit(0)
+	}
 
 	// The reason we assign the fields using the Set API is to perform validations there
 	vsConfig.SetSigningRole(*signingRole)
