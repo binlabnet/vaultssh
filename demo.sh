@@ -88,4 +88,5 @@ $GOPATH/bin/vaultssh -mode addkey -publicKeyPath ~/.ssh/id_rsa.pub -privateKeyPa
 # Typically, vaultssh -mode ssh is run on bastion host which also has network access to the vault server
 # (Note: the system will prompt for the vault userpass credential if not provided)
 
-$GOPATH/bin/vaultssh -mode ssh -sshServerPort 6061 -username ubuntu -passwd newpasswd
+# Commenting out the following line so the travis ci build will not hang on the interactive ssh session - this will be sorted out
+#$GOPATH/bin/vaultssh -mode ssh -sshServerPort 6061 -username ubuntu -passwd newpasswd

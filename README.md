@@ -15,7 +15,7 @@ There are two modes of operation:
 1. ssh: the user uses this mode to log into vault, sign his key and start an interactive ssh session
 
 ## Project Setup
-* The build and demo dependencies include: Go (go1.11.2), Docker (18.09.0), Git (2.18.0), dep (v0.5.0)
+* The build and demo dependencies include: Go (go1.11.2), Docker (18.09.0), Git (2.18.0), dep (v0.5.0), vault (0.11.5)
 * Run "dep ensure" to populate vendor dependencies
 * Of course, make sure you have GOPATH defined and use "go install" to build.
 
