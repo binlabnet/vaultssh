@@ -62,6 +62,8 @@ Mozilla Public License, version 2.0
 * More configurability
 * Support additional Vault user auth backends besides userpass
 
+### GitHubPages: https://richard-mauri.github.io/vaultssh/
+
 ### References links
 * https://golang.github.io/dep/
 * https://godoc.org/github.com/hashicorp/vault/api
