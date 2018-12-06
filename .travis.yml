@@ -7,7 +7,10 @@ services:
   - docker
 
 before_script: 
-  - curl https://releases.hashicorp.com/vault/0.11.5/vault_0.11.5_linux_amd64.zip -o /usr/local/bin/vault.zip
-  - sudo unzip /usr/local/bin/vault.zip
+  - export VAULTDIR=$HOME/local/bin
+  - mkdir -p $VAULTDIR
+  - export PATH=$VAULTDIR:$PATH
+  - curl https://releases.hashicorp.com/vault/0.11.5/vault_0.11.5_linux_amd64.zip -o $VAULTDIR/vault.zip
+  - unzip $VAULTDIR/vault.zip -d $VAULTDIR
 
 script: ./demo.sh
