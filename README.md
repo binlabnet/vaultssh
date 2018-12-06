@@ -22,6 +22,8 @@ There are two modes of operation:
 ## Demo
 The demo.sh starts a vault dev server, an ssh server, configures both, stores ssh keys and uses them to start a session.
 Enter "exit" to abort the ssh terminal session.
+Or, watch this:
+[![asciicast](https://asciinema.org/a/hGrgVLfcCWYAOo4J0G92QvcWz.svg)](https://asciinema.org/a/hGrgVLfcCWYAOo4J0G92QvcWz)
 
 ## Usage
 ```
