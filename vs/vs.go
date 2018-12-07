@@ -33,6 +33,7 @@ type VSConfig struct {
 	vaultToken     string
 	privateKey     string
 	publicKey      string
+        kvVersion      int
 }
 
 func (vsConfig *VSConfig) GetSigningRole() string {
@@ -204,6 +205,14 @@ func (vsConfig *VSConfig) StartSession() (err error) {
 	return vsConfig.StartSessionAux()
 }
 
+func (vsConfig *VSConfig) GetKvVersion() int {
+	return vsConfig.kvVersion
+}
+
+func (vsConfig *VSConfig) SetKvVersion(kvVersion int) {
+	vsConfig.kvVersion = kvVersion
+}
+
 // Really a singleton constructor as flags can't be parsed more than once
 func NewVSConfig() *VSConfig {
 	if vsConfig != nil {
@@ -224,6 +233,7 @@ func NewVSConfig() *VSConfig {
 	sshUsername := flag.String("sshUsername", "ubuntu", "username for ssh session")
 	termType := flag.String("termType", "xterm", "terminal type for session session")
 	sshServerPort := flag.Int("sshServerPort", 22, "port to connect for ssh session")
+	kvVersion := flag.Int("kvVersion", 1, "vault kv verion (1 or 2)")
 	termRows := flag.Int("termRows", 40, "numbr of rows in terminal")
 	termCols := flag.Int("termCols", 80, "numbr of columns in terminal")
 
@@ -252,6 +262,7 @@ func NewVSConfig() *VSConfig {
 	vsConfig.SetSshServerPort(*sshServerPort)
 	vsConfig.SetTermRows(*termRows)
 	vsConfig.SetTermCols(*termCols)
+	vsConfig.SetKvVersion(*kvVersion)
 
 	return vsConfig
 }

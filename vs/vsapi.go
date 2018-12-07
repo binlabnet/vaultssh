@@ -64,6 +64,9 @@ type (
 		GetPublicKey() string
 		SetPublicKey(string)
 
+		GetKvVersion() int
+		SetKvVersion(int)
+
 		AddKeyPair() (err error)
 		StartSession() (err error)
 		SignPubKey(pubKey string) (signedCrt string, err error)
@@ -231,4 +234,12 @@ func GetPublicKey(vsapi VsApi) string {
 
 func SetPublicKey(vsapi VsApi, pubKey string) {
 	vsapi.SetPublicKey(pubKey)
+}
+
+func GetKvVersion(vsapi VsApi) int {
+	return vsapi.GetKvVersion()
+}
+
+func SetKvVersion(vsapi VsApi, kvVersion int) {
+	vsapi.SetKvVersion(kvVersion)
 }

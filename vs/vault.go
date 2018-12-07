@@ -34,8 +34,16 @@ func (vsConfig *VSConfig) SignPubKeyAux(pubkey string) (signedCrt string, err er
 	return signedCrt, err
 }
 
+func (vsConfig *VSConfig) getUserBase() string {
+	if vsConfig.GetKvVersion() == 1 {
+		return "secret"
+	}
+	return "kv"
+}
+
 func (vsConfig *VSConfig) VaultReadSSHKey() (pubkey, privkey string, err error) {
-	path := fmt.Sprintf("kv/users/%s/keys/ssh", vsConfig.GetUsername())
+	base := vsConfig.getUserBase()
+	path := fmt.Sprintf("%s/users/%s/keys/ssh", base, vsConfig.GetUsername())
 
 	s, err := vsConfig.GetVaultClient().Logical().Read(path)
 	if err != nil {
@@ -49,7 +57,8 @@ func (vsConfig *VSConfig) VaultReadSSHKey() (pubkey, privkey string, err error) 
 }
 
 func (vsConfig *VSConfig) VaultWriteSSHKey() (err error) {
-	path := fmt.Sprintf("kv/users/%s/keys/ssh", vsConfig.GetUsername())
+	base := vsConfig.getUserBase()
+	path := fmt.Sprintf("%s/users/%s/keys/ssh", base, vsConfig.GetUsername())
 
 	secret := make(map[string]interface{})
 

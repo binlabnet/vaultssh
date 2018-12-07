@@ -15,7 +15,8 @@ function main {
         usage
     fi
 
-    vault secrets enable -version=1 kv
+    vault secrets disable secret
+    vault secrets enable -version=1 -path=secret kv
     vault secrets enable -path=ssh ssh
     vault auth enable userpass
 

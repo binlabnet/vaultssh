@@ -28,13 +28,26 @@ function main {
     path "ssh/sign/${ROLE}" {
         capabilities = ["create","update"]
     }
-    path "kv/users/${USERNAME}/*" {
-        capabilities = ["create", "read", "update", "delete", "list"]
-    }
-    path "kv/data/users/${USERNAME}/*" {
+    path "secret/users/${USERNAME}/*" {
         capabilities = ["create", "read", "update", "delete", "list"]
     }
 EOH1
+
+# Revisit the vault kv > 1 system setup
+#    vault policy write ssh-${USERNAME}-user - <<EOH1B
+#    path "ssh/sign/${ROLE}" {
+#        capabilities = ["create","update"]
+#    }
+#    path "ssh/sign/${ROLE}" {
+#        capabilities = ["create","update"]
+#    }
+#    path "kv/users/${USERNAME}/*" {
+#        capabilities = ["create", "read", "update", "delete", "list"]
+#    }
+#    path "kv/data/users/${USERNAME}/*" {
+#        capabilities = ["create", "read", "update", "delete", "list"]
+#    }
+#EOH1B
 
     vault write auth/userpass/users/${USERNAME} \
         password=${PASSWORD} \
