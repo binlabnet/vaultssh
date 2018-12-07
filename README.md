@@ -18,14 +18,20 @@ There are two modes of operation:
 * The build and demo dependencies include: Go (go1.11.2), Docker (18.09.0), Git (2.18.0), dep (v0.5.0), vault (0.11.5)
 * Run "dep ensure" to populate vendor dependencies
 * Of course, make sure you have GOPATH defined and use "go install" to build.
+* This uses travis ci and goreleaser for builds and release respectively.
 
 ## Demo
 The demo.sh starts a vault dev server, an ssh server, configures both, stores ssh keys and uses them to start a session.
 Enter "exit" to abort the ssh terminal session.
-Or, watch this:
+Or, watch this (complicated looking demo but most is just docker noise of configuring and running an ssh server) :
 [![asciicast](https://asciinema.org/a/hGrgVLfcCWYAOo4J0G92QvcWz.svg)](https://asciinema.org/a/hGrgVLfcCWYAOo4J0G92QvcWz)
 
 ## Usage
+There are a couple bash scripts under scripts/
+* configure.sh can be used to configure vault to enable userpass and signing. Run it after vault init.
+* adduser.sh can be used to create a vault userpass account and configure policies to be able to sign and ssh.
+In the future, these might become new modes of operation in the vaultssh client binary
+
 ```
 Usage of vaultssh:
   -mode string

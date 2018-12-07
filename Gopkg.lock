@@ -128,7 +128,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:082c538aa8ca5e086d5d20ec16417e7fca237de2c4146485e02aa09989d0ff38"
+  digest = "1:e24ad943b45ca7793d9b207147cf6bfa4d82bdddfeb68ba539f855414882b604"
   name = "golang.org/x/crypto"
   packages = [
     "curve25519",
@@ -138,6 +138,7 @@
     "internal/subtle",
     "poly1305",
     "ssh",
+    "ssh/terminal",
   ]
   pruneopts = "UT"
   revision = "3d3f9f413869b949e48070b5bc593aa22cc2b8f2"
@@ -154,6 +155,17 @@
   ]
   pruneopts = "UT"
   revision = "fae4c4e3ad76c295c3d6d259f898136b4bf833a8"
+
+[[projects]]
+  branch = "master"
+  digest = "1:b9dceb1408ba5105803d5859193bc7d89ac3199b611cf8681dbaa0aa09c10d9c"
+  name = "golang.org/x/sys"
+  packages = [
+    "unix",
+    "windows",
+  ]
+  pruneopts = "UT"
+  revision = "70b957f3b65e069b4930ea94e2721eefa0f8f695"
 
 [[projects]]
   digest = "1:a2ab62866c75542dd18d2b069fec854577a20211d7c0ea6ae746072a1dccdd18"
@@ -192,6 +204,7 @@
   input-imports = [
     "github.com/hashicorp/vault/api",
     "golang.org/x/crypto/ssh",
+    "golang.org/x/crypto/ssh/terminal",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

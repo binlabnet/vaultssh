@@ -1,11 +1,11 @@
 package vs
 
 import (
-	"bufio"
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
+	"syscall"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func Initialize() (vsapi VsApi) {
@@ -44,17 +44,14 @@ func Addkey(vsapi VsApi) (exitcode int) {
 
 	if GetPasswd(vsapi) == "" {
 		fmt.Printf("Enter vault userpass password: ")
-		scanner := bufio.NewScanner(os.Stdin)
-		err := scanner.Err()
+		bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
 		if err != nil {
 			msg := fmt.Sprintf("Unable to read pasword; %v\n", err)
 			log.Printf(msg)
 			exitcode = 6
 			return exitcode
 		}
-		if scanner.Scan() {
-			SetPasswd(vsapi, scanner.Text())
-		}
+		SetPasswd(vsapi, string(bytePassword))
 	}
 
 	err = AddKeyPair(vsapi)
@@ -68,6 +65,18 @@ func Addkey(vsapi VsApi) (exitcode int) {
 }
 
 func Ssh(vsapi VsApi) (exitcode int) {
+	if GetPasswd(vsapi) == "" {
+		fmt.Printf("Enter vault userpass password: ")
+		bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+		if err != nil {
+			msg := fmt.Sprintf("Unable to read pasword; %v\n", err)
+			log.Printf(msg)
+			exitcode = 6
+			return exitcode
+		}
+		SetPasswd(vsapi, string(bytePassword))
+	}
+
 	exitcode = 0
 	err := StartSession(vsapi)
 	if err != nil {
