@@ -60,7 +60,7 @@ func (vsConfig *VSConfig) StartSessionAux() (err error) {
 		reader := bufio.NewReader(os.Stdin)
 		str, _ := reader.ReadString('\n')
 		fmt.Fprint(in, str)
-		if strings.HasPrefix(str, "exit") {
+		if strings.HasPrefix(str, "logout") {
 			break
 		}
 	}
@@ -92,7 +92,6 @@ func (vsConfig *VSConfig) getSignedCertConfig() (clientConfig *ssh.ClientConfig,
 	if err != nil {
 		return clientConfig, err
 	}
-	log.Printf("signer: %v", usigner)
 
 	ucertSigner, err := ssh.NewCertSigner(pcert.(*ssh.Certificate), usigner)
 
