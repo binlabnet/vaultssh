@@ -1,12 +1,11 @@
 package vs
 
 import (
-	"bufio"
 	"fmt"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/terminal"
 	"log"
 	"os"
-	"strings"
 )
 
 func (vsConfig *VSConfig) StartSessionAux() (err error) {
@@ -36,18 +35,39 @@ func (vsConfig *VSConfig) StartSessionAux() (err error) {
 
 	session.Stdout = os.Stdout
 	session.Stderr = os.Stderr
-	in, _ := session.StdinPipe()
+	session.Stdin = os.Stdin
 
 	terminalModes := ssh.TerminalModes{
-		ssh.ECHO:          0,
+		ssh.ECHO:          1,
 		ssh.TTY_OP_ISPEED: 14400,
 		ssh.TTY_OP_OSPEED: 14400,
 	}
 
-	if err := session.RequestPty(vsConfig.GetTermType(), vsConfig.GetTermRows(), vsConfig.GetTermCols(), terminalModes); err != nil {
-		msg := fmt.Sprintf("request for pseudo terminal failed: %v\n", err)
-		log.Printf(msg)
-		return err
+	fileDescriptor := int(os.Stdin.Fd())
+
+	if terminal.IsTerminal(fileDescriptor) {
+
+		originalState, err := terminal.MakeRaw(fileDescriptor)
+		if err != nil {
+			msg := fmt.Sprintf("request for raw terminal failed: %v\n", err)
+			log.Printf(msg)
+			return err
+		}
+		defer terminal.Restore(fileDescriptor, originalState)
+
+		termWidth, termHeight, err := terminal.GetSize(fileDescriptor)
+		if err != nil {
+			msg := fmt.Sprintf("request for terminal size failed: %v\n", err)
+			log.Printf(msg)
+			return err
+		}
+
+		err = session.RequestPty("xterm-256color", termHeight, termWidth, terminalModes) 
+		if err != nil {
+			msg := fmt.Sprintf("request for pseudo terminal failed: %v\n", err)
+			log.Printf(msg)
+			return err
+		}
 	}
 
 	if err := session.Shell(); err != nil {
@@ -56,14 +76,8 @@ func (vsConfig *VSConfig) StartSessionAux() (err error) {
 		return err
 	}
 
-	for {
-		reader := bufio.NewReader(os.Stdin)
-		str, _ := reader.ReadString('\n')
-		fmt.Fprint(in, str)
-		if strings.HasPrefix(str, "logout") {
-			break
-		}
-	}
+	session.Wait() // This call blocks until the user exits the session (e.g. via CTRL + D)
+
 	return err // No error; Ready to exit
 }
 

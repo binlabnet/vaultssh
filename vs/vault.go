@@ -23,7 +23,6 @@ func (vsConfig *VSConfig) SignPubKeyAux(pubkey string) (signedCrt string, err er
 		"permit-user-rc":          "",
 	}
 
-	log.Printf("Calling SignKey with role %s\n", vsConfig.GetSigningRole())
 	secret, err := ssh.SignKey(vsConfig.GetSigningRole(), data)
 	if err != nil {
 		log.Printf("Error signing ssh key; %v\n", err)
