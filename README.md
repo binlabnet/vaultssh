@@ -22,14 +22,20 @@ There are two modes of operation:
 
 ## Demo
 The demo.sh starts a vault dev server, an ssh server, configures both, stores ssh keys and uses them to start a session.
-Or, watch this (complicated looking demo but most is just docker noise of configuring and running an ssh server) :
-[![asciicast](https://asciinema.org/a/hGrgVLfcCWYAOo4J0G92QvcWz.svg)](https://asciinema.org/a/hGrgVLfcCWYAOo4J0G92QvcWz)
+There is a lot of docker noise, wait for the end to see how easy vaultssh is to use
+[![asciicast](https://asciinema.org/a/216279.svg)](https://asciinema.org/a/216279)
 
 ## Usage
 There are a couple bash scripts under scripts/
 * configure.sh can be used to configure vault to enable userpass and signing. Run it after vault init.
 * adduser.sh can be used to create a vault userpass account and configure policies to be able to sign and ssh.
 In the future, these might become new modes of operation in the vaultssh client binary
+
+## Example addkey usage (each user does this once; his vault password is prompted for)
+* $GOPATH/bin/vaultssh -mode addkey -publicKeyPath ~/.ssh/id_rsa.pub -privateKeyPath ~/.ssh/id_rsa -username ubuntu
+
+## Example ssh usage (each user does this to ssh using their signed key in vault)
+* $GOPATH/bin/vaultssh -mode ssh -username ubuntu -passwd newpasswd
 
 ```
 Usage of vaultssh:
@@ -86,3 +92,5 @@ Mozilla Public License, version 2.0
 * https://caitiem.com/2016/08/18/a-quick-guide-to-testing-in-golang/
 * https://github.com/golang/mock
 * https://github.com/cweill/gotests
+* https://goreleaser.com/
+* https://asciinema.org/

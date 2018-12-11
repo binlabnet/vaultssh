@@ -8,8 +8,11 @@ default: bin
 
 all: depends fmt bin test
 
-depends:
+depends-hard:
 	dep ensure -update
+
+depends:
+	dep ensure
 
 bin:
 	go install -ldflags "-X github.com/richard-mauri/vaultssh/vs.VersionString=${VERSIONSTRING}"
@@ -22,6 +25,6 @@ fmt:
 
 release:
 	git tag -a ${VERSION} -m "${TAGDESC}"
-#	RELVERSION=${VERSIONSTRING} goreleaser 
+	RELVERSION=${VERSIONSTRING} goreleaser 
 
-.PHONY: all bin default test fmt depends release
+.PHONY: all bin default test fmt depends release depends-hard
