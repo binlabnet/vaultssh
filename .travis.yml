@@ -6,7 +6,7 @@ go:
 services:
   - docker
 
-befoer_install:
+before_install:
   - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
 
 before_script: 
