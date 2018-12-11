@@ -24,7 +24,7 @@ fmt:
 	gofmt -w $(GOFMT_FILES)
 
 release:
-	git tag -a ${VERSION} -m "${TAGDESC}"
+	git tag -a ${VERSION} -m ${TAGDESC}
 	RELVERSION=${VERSIONSTRING} goreleaser 
 
 .PHONY: all bin default test fmt depends release depends-hard
