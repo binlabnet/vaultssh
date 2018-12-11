@@ -6,6 +6,9 @@ go:
 services:
   - docker
 
+befoer_install:
+  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+
 before_script: 
   - export VAULTDIR=$HOME/local/bin
   - mkdir -p $VAULTDIR
