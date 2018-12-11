@@ -9,7 +9,7 @@ before:
 builds:
 - env:
   - CGO_ENABLED=0
-  - -X github.com/richard-mauri/vaultssh/vs.VersionString={{.Version}}-{{.Date}}-{{.Commit}}
+  - -X github.com/richard-mauri/vaultssh/vs.VersionString={{.Env.RELVERSION}}
 archive:
   replacements:
     darwin: Darwin

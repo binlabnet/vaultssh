@@ -2,10 +2,10 @@ package vs
 
 import (
 	"fmt"
+	"golang.org/x/crypto/ssh/terminal"
 	"io/ioutil"
 	"log"
 	"syscall"
-	"golang.org/x/crypto/ssh/terminal"
 )
 
 func Initialize() (vsapi VsApi) {

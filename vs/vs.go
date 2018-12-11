@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	vsConfig *VSConfig // Singleton: NewVSConfig "constructor" uses flags which can't be run > 1
+	vsConfig      *VSConfig // Singleton: NewVSConfig "constructor" uses flags which can't be run > 1
 	VersionString string
 )
 
@@ -33,7 +33,7 @@ type VSConfig struct {
 	vaultToken     string
 	privateKey     string
 	publicKey      string
-        kvVersion      int
+	kvVersion      int
 }
 
 func (vsConfig *VSConfig) GetSigningRole() string {

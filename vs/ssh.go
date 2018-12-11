@@ -62,7 +62,7 @@ func (vsConfig *VSConfig) StartSessionAux() (err error) {
 			return err
 		}
 
-		err = session.RequestPty("xterm-256color", termHeight, termWidth, terminalModes) 
+		err = session.RequestPty("xterm-256color", termHeight, termWidth, terminalModes)
 		if err != nil {
 			msg := fmt.Sprintf("request for pseudo terminal failed: %v\n", err)
 			log.Printf(msg)
