@@ -7,8 +7,10 @@ import (
 )
 
 const (
-	ADDKEY = "addkey"
-	SSH    = "ssh"
+	ADDKEY  = "addkey"
+	SSH     = "ssh"
+	SCPTO   = "scpto"
+	SCPFROM = "scpfrom"
 )
 
 type (
@@ -37,12 +39,6 @@ type (
 		GetTermType() string
 		SetTermType(string)
 
-		GetTermRows() int
-		SetTermRows(int)
-
-		GetTermCols() int
-		SetTermCols(int)
-
 		GetUsername() string
 		SetUsername(string)
 
@@ -69,6 +65,7 @@ type (
 
 		AddKeyPair() (err error)
 		StartSession() (err error)
+		ScpSession() (err error)
 		SignPubKey(pubKey string) (signedCrt string, err error)
 		VaultReadSSHKey() (pubKey, privKey string, err error)
 		VaultWriteSSHKey() (err error)
@@ -78,6 +75,10 @@ type (
 
 func AddKeyPair(vsapi VsApi) (err error) {
 	return vsapi.AddKeyPair()
+}
+
+func ScpSession(vsapi VsApi) (err error) {
+	return vsapi.ScpSession()
 }
 
 func StartSession(vsapi VsApi) (err error) {
@@ -162,22 +163,6 @@ func GetTermType(vsapi VsApi) string {
 
 func SetTermType(vsapi VsApi, termtype string) {
 	vsapi.SetTermType(termtype)
-}
-
-func GetTermRows(vsapi VsApi) int {
-	return vsapi.GetTermRows()
-}
-
-func SetTermRows(vsapi VsApi, rows int) {
-	vsapi.SetTermRows(rows)
-}
-
-func GetTermCols(vsapi VsApi) int {
-	return vsapi.GetTermCols()
-}
-
-func SetTermCols(vsapi VsApi, cols int) {
-	vsapi.SetTermCols(cols)
 }
 
 func GetSshUsername(vsapi VsApi) string {

@@ -64,7 +64,8 @@ func Addkey(vsapi VsApi) (exitcode int) {
 	return exitcode
 }
 
-func Ssh(vsapi VsApi) (exitcode int) {
+func interactivePassword(vsapi VsApi) (exitcode int) {
+	exitcode = 0
 	if GetPasswd(vsapi) == "" {
 		fmt.Printf("Enter vault userpass password: ")
 		bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
@@ -76,8 +77,24 @@ func Ssh(vsapi VsApi) (exitcode int) {
 		}
 		SetPasswd(vsapi, string(bytePassword))
 	}
+	return exitcode
+}
 
-	exitcode = 0
+func Scp(vsapi VsApi) (exitcode int) {
+	exitcode = interactivePassword(vsapi)
+
+	err := ScpSession(vsapi)
+	if err != nil {
+		msg := fmt.Sprintf("Unable to start scp session; %v\n", err)
+		log.Printf(msg)
+		exitcode = 8
+	}
+	return exitcode
+}
+
+func Ssh(vsapi VsApi) (exitcode int) {
+	exitcode = interactivePassword(vsapi)
+
 	err := StartSession(vsapi)
 	if err != nil {
 		msg := fmt.Sprintf("Unable to start session; %v\n", err)

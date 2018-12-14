@@ -1,34 +1,152 @@
 package vs
 
 import (
+	"bytes"
+	"strings"
 	"fmt"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
+	"io"
+	"io/ioutil"
 	"log"
 	"os"
+	"path"
 )
 
-func (vsConfig *VSConfig) StartSessionAux() (err error) {
-	err = vsConfig.VaultLogin()
+func (vsConfig *VSConfig) copyFrom(session *ssh.Session) (err error) {
+	return err
+}
+
+func (vsConfig *VSConfig) copyTo(session *ssh.Session) (err error) {
+	file, err := os.Open(vsConfig.GetLocalPath())
 	if err != nil {
 		return err
+	}
+	defer file.Close()
+
+	stat, err := file.Stat()
+	if err != nil {
+		return err
+	}
+
+	return vsConfig.copyToAux(session, file, stat.Size())
+}
+
+func (vsConfig *VSConfig) copyToReader(session *ssh.Session, fileReader io.Reader) (err error) {
+	contents_bytes, _ := ioutil.ReadAll(fileReader)
+	bytes_reader := bytes.NewReader(contents_bytes)
+
+	return vsConfig.copyToAux(session, bytes_reader, int64(len(contents_bytes)))
+}
+
+func getLocalPermString(filename string) (permstr string, err error) {
+	perm := os.FileMode(0777)
+	flag := os.O_RDONLY
+	f, err := os.OpenFile(filename, flag, perm)
+	if err != nil {
+		return permstr, err
+	}
+	defer f.Close()
+
+	fi, err := f.Stat()
+	if err != nil {
+		return permstr, err
+	}
+	perm &= fi.Mode()
+	permstr = fmt.Sprintf("0%o", perm)
+	return permstr, err
+}
+
+func (vsConfig *VSConfig) copyToAux(session *ssh.Session, r io.Reader, size int64) (err error) {
+	local := vsConfig.GetLocalPath()
+	permissions, err := getLocalPermString(local)
+	if err != nil {
+		msg := fmt.Sprintf("Unable to get local file permisions for %s; %v\n", local, err)
+		log.Printf(msg)
+		return err
+	}
+
+	filename := path.Base(local)
+
+	remote := vsConfig.GetRemotePath()
+	if strings.HasSuffix(remote, "/") {
+		remote = remote + filename
+	}
+
+	filename = path.Base(remote)
+	directory := path.Dir(remote)
+
+	go func() {
+		w, err := session.StdinPipe()
+		if err != nil {
+			msg := fmt.Sprintf("Unable to connect to session stdtin pipe; %v\n", err)
+			log.Printf(msg)
+			// TODO: Error handling
+		} else {
+			defer w.Close()
+			fmt.Fprintln(w, "C"+permissions, size, filename)
+			io.Copy(w, r)
+			fmt.Fprint(w, "\x00") // Do Not use Fprintln else bad error code will be returned
+		}
+	}()
+
+	cmd := "/usr/bin/scp -qt " + directory
+	err = session.Run(cmd)
+	if err != nil {
+		msg := fmt.Sprintf("Remote scp command \"%s\" failed;  %+v", cmd, err)
+		log.Printf(msg)
+	}
+	return err
+}
+
+func (vsConfig *VSConfig) setupSession() (session *ssh.Session, err error) {
+	err = vsConfig.VaultLogin()
+	if err != nil {
+		return session, err
 	}
 
 	clientConfig, err := vsConfig.getSignedCertConfig()
+	if err != nil {
+		return session, err
+	}
+
 	addr := fmt.Sprintf("%s:%d", vsConfig.GetSshServerHost(), vsConfig.GetSshServerPort())
 
-	conn, err := ssh.Dial("tcp", addr, clientConfig)
+	client, err := ssh.Dial("tcp", addr, clientConfig)
 	if err != nil {
-		msg := fmt.Sprintf("Unable to connect to %s: %v\n", addr, err)
+		msg := fmt.Sprintf("Unable to dial %s: %v\n", addr, err)
 		log.Printf(msg)
-		return err
+		return session, err
 	}
-	defer conn.Close()
 
-	session, err := conn.NewSession()
+	session, err = client.NewSession()
 	if err != nil {
 		msg := fmt.Sprintf("Unable to create session: %v\n", err)
 		log.Printf(msg)
+		return session, err
+	}
+	return session, err
+}
+
+func (vsConfig *VSConfig) ScpSessionAux() (err error) {
+
+	session, err := vsConfig.setupSession()
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+
+	if vsConfig.GetMode() == SCPTO {
+		err = vsConfig.copyTo(session)
+	} else if vsConfig.GetMode() == SCPFROM {
+		err = vsConfig.copyFrom(session)
+	} // TODO: adjust SetMode validation
+	return err
+}
+
+func (vsConfig *VSConfig) StartSessionAux() (err error) {
+	session, err := vsConfig.setupSession()
+	if err != nil {
 		return err
 	}
 	defer session.Close()
@@ -62,7 +180,7 @@ func (vsConfig *VSConfig) StartSessionAux() (err error) {
 			return err
 		}
 
-		err = session.RequestPty("xterm-256color", termHeight, termWidth, terminalModes)
+		err = session.RequestPty(vsConfig.GetTermType(), termHeight, termWidth, terminalModes)
 		if err != nil {
 			msg := fmt.Sprintf("request for pseudo terminal failed: %v\n", err)
 			log.Printf(msg)

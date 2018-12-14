@@ -16,6 +16,8 @@ var (
 )
 
 type VSConfig struct {
+	localPath      string
+	remotePath     string
 	signingRole    string
 	mode           string
 	vaultAddress   string
@@ -24,8 +26,6 @@ type VSConfig struct {
 	sshServerHost  string
 	sshServerPort  int
 	termType       string
-	termRows       int
-	termCols       int
 	username       string
 	sshUsername    string
 	passwd         string
@@ -89,6 +89,22 @@ func (vsConfig *VSConfig) SetPublicKeyPath(keypath string) {
 	vsConfig.publicKeyPath = keypath
 }
 
+func (vsConfig *VSConfig) GetLocalPath() string {
+	return vsConfig.localPath
+}
+
+func (vsConfig *VSConfig) SetLocalPath(localpath string) {
+	vsConfig.localPath = localpath
+}
+
+func (vsConfig *VSConfig) GetRemotePath() string {
+	return vsConfig.remotePath
+}
+
+func (vsConfig *VSConfig) SetRemotePath(remotepath string) {
+	vsConfig.remotePath = remotepath
+}
+
 func (vsConfig *VSConfig) GetPrivateKeyPath() string {
 	return vsConfig.privateKeyPath
 }
@@ -119,22 +135,6 @@ func (vsConfig *VSConfig) GetTermType() string {
 
 func (vsConfig *VSConfig) SetTermType(termtype string) {
 	vsConfig.termType = termtype
-}
-
-func (vsConfig *VSConfig) GetTermRows() int {
-	return vsConfig.termRows
-}
-
-func (vsConfig *VSConfig) SetTermRows(rows int) {
-	vsConfig.termRows = rows
-}
-
-func (vsConfig *VSConfig) GetTermCols() int {
-	return vsConfig.termCols
-}
-
-func (vsConfig *VSConfig) SetTermCols(cols int) {
-	vsConfig.termCols = cols
 }
 
 func (vsConfig *VSConfig) GetSshUsername() string {
@@ -201,6 +201,10 @@ func (vsConfig *VSConfig) SignPubKey(pubKey string) (signedCrt string, err error
 	return vsConfig.SignPubKeyAux(pubKey)
 }
 
+func (vsConfig *VSConfig) ScpSession() (err error) {
+	return vsConfig.ScpSessionAux()
+}
+
 func (vsConfig *VSConfig) StartSession() (err error) {
 	return vsConfig.StartSessionAux()
 }
@@ -223,19 +227,19 @@ func NewVSConfig() *VSConfig {
 
 	version := flag.Bool("v", false, "prints current version")
 	signingRole := flag.String("signingRole", "regular-role", "ssh client signing role")
-	mode := flag.String("mode", SSH, "one of: addkey | ssh")
+	mode := flag.String("mode", SSH, "one of: addkey | ssh | scpto | scpfrom")
+	localPath := flag.String("localPath", "", "fully qualified path to local file to scp from")
+	remotePath := flag.String("remotePath", "", "fully qualified path to remote file to scp to")
 	vaultAddress := flag.String("vaultAddress", "http://localhost:8200", "vault address")
-	publicKeyPath := flag.String("publicKeyPath", "", "path to ssh public key file")
-	privateKeyPath := flag.String("privateKeyPath", "", "path to ssh private key file")
+	publicKeyPath := flag.String("publicKeyPath", "", "fully qualified path to ssh public key file")
+	privateKeyPath := flag.String("privateKeyPath", "", "fully qualified path to ssh private key file")
 	sshServerHost := flag.String("sshServerHost", "0.0.0.0", "hostname to connect for ssh seesion")
 	username := flag.String("username", "ubuntu", "username for vault auth")
 	passwd := flag.String("passwd", "", "password for vault auth (will prompt if empty)")
-	sshUsername := flag.String("sshUsername", "ubuntu", "username for ssh session")
-	termType := flag.String("termType", "xterm", "terminal type for session session")
+	sshUsername := flag.String("sshUsername", "", "username for ssh session (defaults to username value)")
+	termType := flag.String("termType", "xterm-256color", "terminal type for session session")
 	sshServerPort := flag.Int("sshServerPort", 22, "port to connect for ssh session")
 	kvVersion := flag.Int("kvVersion", 1, "vault kv verion (1 or 2)")
-	termRows := flag.Int("termRows", 40, "numbr of rows in terminal")
-	termCols := flag.Int("termCols", 80, "numbr of columns in terminal")
 
 	flag.Parse()
 
@@ -252,16 +256,20 @@ func NewVSConfig() *VSConfig {
 		log.Printf("Bad value for vaultAddress \"%s\"; %v\n", *vaultAddress, err)
 		os.Exit(1)
 	}
+	vsConfig.SetLocalPath(*localPath)
+	vsConfig.SetRemotePath(*remotePath)
 	vsConfig.SetPublicKeyPath(*publicKeyPath)
 	vsConfig.SetPrivateKeyPath(*privateKeyPath)
 	vsConfig.SetSshServerHost(*sshServerHost)
 	vsConfig.SetUsername(*username)
 	vsConfig.SetPasswd(*passwd)
-	vsConfig.SetSshUsername(*sshUsername)
+	if *sshUsername == "" {
+		vsConfig.SetSshUsername(*username)
+	} else {
+		vsConfig.SetSshUsername(*sshUsername)
+	}
 	vsConfig.SetTermType(*termType)
 	vsConfig.SetSshServerPort(*sshServerPort)
-	vsConfig.SetTermRows(*termRows)
-	vsConfig.SetTermCols(*termCols)
 	vsConfig.SetKvVersion(*kvVersion)
 
 	return vsConfig

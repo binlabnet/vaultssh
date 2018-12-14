@@ -20,4 +20,6 @@ $GOPATH/bin/vaultssh -mode addkey -publicKeyPath ~/.ssh/id_rsa.pub -privateKeyPa
 # Typically, vaultssh -mode ssh is run on bastion host which also has network access to the vault server
 # (Note: the system will prompt for the vault userpass credential if not provided)
 
+$GOPATH/bin/vaultssh -mode scpto -sshServerPort 6061 -username ubuntu -passwd newpasswd -localPath ./README.md -remotePath /home/ubuntu/README.md
+
 $GOPATH/bin/vaultssh -mode ssh -sshServerPort 6061 -username ubuntu -passwd newpasswd

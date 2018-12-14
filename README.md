@@ -1,18 +1,21 @@
-A Vault client supporting interactive ssh sessions using signed ssh certificates done all in-memory.
+A Vault client supporting ssh remote commands, interactive sessions and scp file transfer using signed ssh certificates done all in-memory.
 
 ## vaultssh
  It is motivated by the need to be able to ssh from a shared bastion jump host and we :
- * Cannot store keys on disk
+ * Cannot store keys on disk (not secure)
+ * Cannot use ssh agent forwarding (not secure)
  * Don't want to remember or manage a complicated passphrase
  
- For this system to work, the ssh servers must be configured to trust the vault ca, which signs the users ssh cert.
+For this system to work, the ssh servers must be configured to trust the vault ca, which signs the users ssh cert.
  
- The demo script captures all the steps so use that as reference.
+The demo script captures all the steps so use that as reference.
 
 ## Operation
-There are two modes of operation:
+Here are the modes of operation:
 1. addkey : user injects his ssh keypair into Vault *once* for subsequent ssh access
 1. ssh: the user uses this mode to log into vault, sign his key and start an interactive ssh session
+1. scpto: the user uses this mode to log into vault, sign his key and transfer files to a remote system
+1. scpfrom: the user uses this mode to log into vault, sign his key and transfer files from a remote system
 
 ## Project Setup
 * The build and demo dependencies include: Go (go1.11.2), Docker (18.09.0), Git (2.18.0), dep (v0.5.0), vault (0.11.5)
@@ -35,18 +38,27 @@ In the future, these might become new modes of operation in the vaultssh client 
 * $GOPATH/bin/vaultssh -mode addkey -publicKeyPath ~/.ssh/id_rsa.pub -privateKeyPath ~/.ssh/id_rsa -username ubuntu
 
 ## Example ssh usage (each user does this to ssh using their signed key in vault)
-* $GOPATH/bin/vaultssh -mode ssh -username ubuntu -passwd newpasswd
+* $GOPATH/bin/vaultssh -mode ssh -username ubuntu -sshServerHost infra1.foo.com
+
+## Example scp usage (each user does this to ssh using their signed key in vault)
+* $GOPATH/bin/vaultssh -mode scp -username ubuntu -localPath /tmp/source.txt  -remotePath /home/ubuntu/source.txt -sshServerHost infra1.foo.com
 
 ```
 Usage of vaultssh:
+  -kvVersion int
+    	vault kv verion (1 or 2) (default 1)
+  -localPath string
+    	fully qualified path to local file to scp from
   -mode string
-    	one of: addkey | ssh (default "addkey")
+    	one of: addkey | ssh | scpto | scpfrom (default "ssh")
   -passwd string
     	password for vault auth (will prompt if empty)
   -privateKeyPath string
-    	path to ssh private key file
+    	fully qualified path to ssh private key file
   -publicKeyPath string
-    	path to ssh public key file
+    	fully qualified path to ssh public key file
+  -remotePath string
+    	fully qualified path to remote file to scp to
   -signingRole string
     	ssh client signing role (default "regular-role")
   -sshServerHost string
@@ -54,15 +66,12 @@ Usage of vaultssh:
   -sshServerPort int
     	port to connect for ssh session (default 22)
   -sshUsername string
-    	username for ssh session (default "ubuntu")
-  -termCols int
-    	numbr of columns in terminal (default 80)
-  -termRows int
-    	numbr of rows in terminal (default 40)
+    	username for ssh session (defaults to username value)
   -termType string
-    	terminal type for session session (default "xterm")
+    	terminal type for session session (default "xterm-256color")
   -username string
     	username for vault auth (default "ubuntu")
+  -v	prints current version
   -vaultAddress string
     	vault address (default "http://localhost:8200")
 ```
@@ -74,6 +83,8 @@ Mozilla Public License, version 2.0
 * Test cases
 * More configurability
 * Support additional Vault user auth backends besides userpass
+* ssh remote commands
+* scp from file transfer
 
 ### GitHubPages: https://richard-mauri.github.io/vaultssh/
 
