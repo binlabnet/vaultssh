@@ -2,6 +2,7 @@ package vs
 
 import (
 	"bytes"
+	"strconv"
 	"strings"
 	"fmt"
 	"golang.org/x/crypto/ssh"
@@ -13,7 +14,142 @@ import (
 	"path"
 )
 
+const (
+	BUFSIZE = 1024
+)
+
+func (vsConfig *VSConfig) openForContent(filename, permissions string, len int) (f *os.File, err error) {
+	f, err = os.Create(vsConfig.GetLocalPath())
+	return f, err
+
+}
+
+func (vsConfig *VSConfig) saveContent(w *os.File, content []byte) (err error) {
+	_, err = w.Write(content)
+	return err
+}
+
 func (vsConfig *VSConfig) copyFrom(session *ssh.Session) (err error) {
+
+	go func() {
+		w, err1 := session.StdinPipe()
+		if err1 != nil {
+			msg := fmt.Sprintf("Unable to connect to session stdin pipe; %v\n", err1)
+			log.Printf(msg)
+			// TODO: Error handling
+		}
+		r, err2 := session.StdoutPipe()
+		if err2 != nil {
+			msg := fmt.Sprintf("Unable to connect to session stdout pipe; %v\n", err2)
+			log.Printf(msg)
+		}
+
+		if err1 == nil && err2 == nil {
+			fmt.Fprint(w, "\x00") // start the conversation - request the header
+			
+			buf := make([]byte, 1)
+			n, err := io.ReadFull(r, buf)
+			if err != nil {
+				msg := fmt.Sprintf("Unable to read; %v\n", err)
+				log.Printf(msg)
+			}
+
+			code := buf[0]
+			switch code {
+			case 'C':
+				// Receive file code
+
+				buf = make([]byte, BUFSIZE)
+				n, err = r.Read(buf)
+				if err != nil {
+					msg := fmt.Sprintf("Unable to read; %v\n", err)
+					log.Printf(msg)
+				} else {
+					s := string(buf[:n]) // Ex: s = "0644 15 HELLO"
+
+					parts := strings.Split(s, " ")
+
+					permissions := parts[0]
+					lenstr := parts[1]
+					filename := parts[2]
+
+					contentLength, err := strconv.Atoi(lenstr)
+					if err != nil {
+						msg := fmt.Sprintf("Unable to convert header content length for \"%s\"; %v\n", s, err)
+						log.Printf(msg)
+					}
+
+					if contentLength < BUFSIZE {
+						buf = make([]byte, contentLength)
+					}
+
+					fmt.Fprint(w, "\x00") // Request for content
+
+					f, err := vsConfig.openForContent(filename, permissions, contentLength)
+					if err != nil {
+						msg := fmt.Sprintf("Unable to open file %s for content; %v\n", s, err)
+						log.Printf(msg)
+					}
+					defer f.Close()
+
+					remainder := contentLength
+					for {
+						if remainder == 0 {
+							break // Assert it was previouisly saved
+						} else if remainder < BUFSIZE {
+							buf = make([]byte, remainder)
+						} else if remainder >= BUFSIZE {
+							buf = make([]byte, BUFSIZE)
+						}
+
+						n, err := r.Read(buf)
+						if err != nil {
+							if err == io.EOF {
+								err = vsConfig.saveContent(f, buf[:n])
+								if err != nil {
+									msg := fmt.Sprintf("Unable to save content for \"%s\"; %v\n", s, err)
+									log.Printf(msg)
+								}
+								break
+							}
+							msg := fmt.Sprintf("Unable to read content for \"%s\"; %v\n", s, err)
+							log.Printf(msg)
+						}
+						remainder -= n
+
+						err = vsConfig.saveContent(f, buf[:n])
+						if err != nil {
+							msg := fmt.Sprintf("Unable to save content for \"%s\"; %v\n", s, err)
+							log.Printf(msg)
+						}
+					}
+				}
+			case 'T':
+				msg := fmt.Sprintf("Got code T\n")
+				log.Printf(msg)
+			case 'D':
+				msg := fmt.Sprintf("Got code D\n")
+				log.Printf(msg)
+			case 'E':
+				msg := fmt.Sprintf("Got code E\n")
+				log.Printf(msg)
+			default:
+				msg := fmt.Sprintf("Unknown code %v\n", code)
+				log.Printf(msg)
+			}
+
+			fmt.Fprint(w, "\x00")
+		}
+	}()
+
+	remote := vsConfig.GetRemotePath()
+	cmd := "/usr/bin/scp -qf " + remote
+
+	err = session.Run(cmd)
+	if err != nil {
+		msg := fmt.Sprintf("Remote scp command \"%s\" failed;  %+v", cmd, err)
+		log.Printf(msg)
+	}
 	return err
 }
 

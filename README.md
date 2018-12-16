@@ -105,3 +105,5 @@ Mozilla Public License, version 2.0
 * https://github.com/cweill/gotests
 * https://goreleaser.com/
 * https://asciinema.org/
+* https://docstore.mik.ua/orelly/networking_2ndEd/ssh/index.htm
+* https://docstore.mik.ua/orelly/networking_2ndEd/ssh/ch03_08.htm
