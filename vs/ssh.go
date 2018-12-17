@@ -30,18 +30,31 @@ func (vsConfig *VSConfig) saveContent(w *os.File, content []byte) (err error) {
 }
 
 func (vsConfig *VSConfig) copyFrom(session *ssh.Session) (err error) {
+	errchan := make(chan error)
+	err = vsConfig.copyFromAux(session, errchan)
+	if err != nil {
+		return err
+	}
+	err = <- errchan
+	return err
+}
+
+func (vsConfig *VSConfig) copyFromAux(session *ssh.Session, errchan chan error) (err error) {
 
 	go func() {
 		w, err1 := session.StdinPipe()
 		if err1 != nil {
 			msg := fmt.Sprintf("Unable to connect to session stdin pipe; %v\n", err1)
 			log.Printf(msg)
-			// TODO: Error handling
+			errchan <- err1
+			return
 		}
 		r, err2 := session.StdoutPipe()
 		if err2 != nil {
 			msg := fmt.Sprintf("Unable to connect to session stdout pipe; %v\n", err2)
 			log.Printf(msg)
+			errchan <- err2
+			return
 		}
 
 		if err1 == nil && err2 == nil {
@@ -52,6 +65,8 @@ func (vsConfig *VSConfig) copyFrom(session *ssh.Session) (err error) {
 			if err != nil {
 				msg := fmt.Sprintf("Unable to read; %v\n", err)
 				log.Printf(msg)
+				errchan <- err
+				return
 			}
 
 			code := buf[0]
@@ -64,6 +79,8 @@ func (vsConfig *VSConfig) copyFrom(session *ssh.Session) (err error) {
 				if err != nil {
 					msg := fmt.Sprintf("Unable to read; %v\n", err)
 					log.Printf(msg)
+					errchan <- err
+					return
 				} else {
 					s := string(buf[:n]) // Ex: s = "0644 15 HELLO"
 
@@ -77,6 +94,8 @@ func (vsConfig *VSConfig) copyFrom(session *ssh.Session) (err error) {
 					if err != nil {
 						msg := fmt.Sprintf("Unable to convert header content length for \"%s\"; %v\n", s, err)
 						log.Printf(msg)
+						errchan <- err
+						return
 					}
 
 					if contentLength < BUFSIZE {
@@ -89,6 +108,8 @@ func (vsConfig *VSConfig) copyFrom(session *ssh.Session) (err error) {
 					if err != nil {
 						msg := fmt.Sprintf("Unable to open file %s for content; %v\n", s, err)
 						log.Printf(msg)
+						errchan <- err
+						return
 					}
 					defer f.Close()
 
@@ -109,11 +130,15 @@ func (vsConfig *VSConfig) copyFrom(session *ssh.Session) (err error) {
 								if err != nil {
 									msg := fmt.Sprintf("Unable to save content for \"%s\"; %v\n", s, err)
 									log.Printf(msg)
+									errchan <- err
+									return
 								}
 								break
 							}
 							msg := fmt.Sprintf("Unable to read content for \"%s\"; %v\n", s, err)
 							log.Printf(msg)
+							errchan <- err
+							return
 						}
 						remainder -= n
 
@@ -121,6 +146,8 @@ func (vsConfig *VSConfig) copyFrom(session *ssh.Session) (err error) {
 						if err != nil {
 							msg := fmt.Sprintf("Unable to save content for \"%s\"; %v\n", s, err)
 							log.Printf(msg)
+							errchan <- err
+							return
 						}
 					}
 				}
@@ -140,11 +167,11 @@ func (vsConfig *VSConfig) copyFrom(session *ssh.Session) (err error) {
 
 			fmt.Fprint(w, "\x00")
 		}
+		errchan <- nil
 	}()
 
 	remote := vsConfig.GetRemotePath()
 	cmd := "/usr/bin/scp -qf " + remote
-
 	err = session.Run(cmd)
 	if err != nil {
 		msg := fmt.Sprintf("Remote scp command \"%s\" failed;  %+v", cmd, err)
@@ -165,14 +192,26 @@ func (vsConfig *VSConfig) copyTo(session *ssh.Session) (err error) {
 		return err
 	}
 
-	return vsConfig.copyToAux(session, file, stat.Size())
+	errchan := make(chan error)
+	err = vsConfig.copyToAux(session, file, stat.Size(), errchan)
+	if err != nil {
+		return err
+	}
+	err = <- errchan
+	return err
 }
 
 func (vsConfig *VSConfig) copyToReader(session *ssh.Session, fileReader io.Reader) (err error) {
 	contents_bytes, _ := ioutil.ReadAll(fileReader)
 	bytes_reader := bytes.NewReader(contents_bytes)
 
-	return vsConfig.copyToAux(session, bytes_reader, int64(len(contents_bytes)))
+	errchan := make(chan error)
+	err = vsConfig.copyToAux(session, bytes_reader, int64(len(contents_bytes)), errchan)
+	if err != nil {
+		return err
+	}
+	err = <- errchan
+	return err
 }
 
 func getLocalPermString(filename string) (permstr string, err error) {
@@ -193,7 +232,7 @@ func getLocalPermString(filename string) (permstr string, err error) {
 	return permstr, err
 }
 
-func (vsConfig *VSConfig) copyToAux(session *ssh.Session, r io.Reader, size int64) (err error) {
+func (vsConfig *VSConfig) copyToAux(session *ssh.Session, r io.Reader, size int64, errchan chan error) (err error) {
 	local := vsConfig.GetLocalPath()
 	permissions, err := getLocalPermString(local)
 	if err != nil {
@@ -210,28 +249,33 @@ func (vsConfig *VSConfig) copyToAux(session *ssh.Session, r io.Reader, size int6
 	}
 
 	filename = path.Base(remote)
-	directory := path.Dir(remote)
 
 	go func() {
 		w, err := session.StdinPipe()
 		if err != nil {
-			msg := fmt.Sprintf("Unable to connect to session stdtin pipe; %v\n", err)
+			msg := fmt.Sprintf("Unable to connect to session stdin pipe; %v\n", err)
 			log.Printf(msg)
-			// TODO: Error handling
+			errchan <- err
+			return
 		} else {
-			defer w.Close()
 			fmt.Fprintln(w, "C"+permissions, size, filename)
 			io.Copy(w, r)
-			fmt.Fprint(w, "\x00") // Do Not use Fprintln else bad error code will be returned
+			fmt.Fprint(w, "\x00")
+			w.Close()
 		}
+		errchan <- nil
 	}()
 
+
+	directory := path.Dir(remote)
 	cmd := "/usr/bin/scp -qt " + directory
 	err = session.Run(cmd)
 	if err != nil {
 		msg := fmt.Sprintf("Remote scp command \"%s\" failed;  %+v", cmd, err)
 		log.Printf(msg)
+		return err
 	}
+
 	return err
 }
 
@@ -276,6 +320,9 @@ func (vsConfig *VSConfig) ScpSessionAux() (err error) {
 		err = vsConfig.copyTo(session)
 	} else if vsConfig.GetMode() == SCPFROM {
 		err = vsConfig.copyFrom(session)
+		if err != nil {
+			return err
+		}
 	} // TODO: adjust SetMode validation
 	return err
 }
