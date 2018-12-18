@@ -20,6 +20,17 @@ $GOPATH/bin/vaultssh -mode addkey -publicKeyPath ~/.ssh/id_rsa.pub -privateKeyPa
 # Typically, vaultssh -mode ssh is run on bastion host which also has network access to the vault server
 # (Note: the system will prompt for the vault userpass credential if not provided)
 
-$GOPATH/bin/vaultssh -mode scpto -sshServerPort 6061 -username ubuntu -passwd newpasswd -localPath ./README.md -remotePath /home/ubuntu/README.md
+rm ./vendor*.tar.gz >& /dev/null
+tar czf ./vendor.tar.gz ./vendor
+ls -l ./vendor*.tar.gz
+
+echo "Copying vendor tar file to remote"
+$GOPATH/bin/vaultssh -mode scpto -sshServerPort 6061 -username ubuntu -passwd newpasswd -localPath ./vendor.tar.gz -remotePath /home/ubuntu/
+
+echo "Copying vendor tar file from remote"
+$GOPATH/bin/vaultssh -mode scpfrom -sshServerPort 6061 -username ubuntu -passwd newpasswd -localPath ./vendor2.tar.gz -remotePath /home/ubuntu/vendor.tar.gz
+
+ls -l ./vendor*.tar.gz
+sum ./vendor*.tar.gz
 
 $GOPATH/bin/vaultssh -mode ssh -sshServerPort 6061 -username ubuntu -passwd newpasswd

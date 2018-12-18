@@ -1,5 +1,5 @@
-VERSION=v0.1.1
-TAGDESC="Second release"
+VERSION=v0.1.2
+TAGDESC="Third release"
 BUILDTIME?=$$(date +%m-%d-%Y-%H:%M)
 VERSIONSTRING=${VERSION}-${BUILDTIME}
 GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)

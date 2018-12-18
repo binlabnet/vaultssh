@@ -35,20 +35,23 @@ There are a couple bash scripts under scripts/
 In the future, these might become new modes of operation in the vaultssh client binary
 
 ## Example addkey usage (each user does this once; his vault password is prompted for)
-* $GOPATH/bin/vaultssh -mode addkey -publicKeyPath ~/.ssh/id_rsa.pub -privateKeyPath ~/.ssh/id_rsa -username ubuntu
+* vaultssh -mode addkey -publicKeyPath ~/.ssh/id_rsa.pub -privateKeyPath ~/.ssh/id_rsa -username ubuntu
 
-## Example ssh usage (each user does this to ssh using their signed key in vault)
-* $GOPATH/bin/vaultssh -mode ssh -username ubuntu -sshServerHost infra1.foo.com
+## Example ssh interactive usage:
+* vaultssh -mode ssh -username ubuntu -sshServerHost infra1.foo.com
 
-## Example scp usage (each user does this to ssh using their signed key in vault)
-* $GOPATH/bin/vaultssh -mode scp -username ubuntu -localPath /tmp/source.txt  -remotePath /home/ubuntu/source.txt -sshServerHost infra1.foo.com
+## Example scp to usage:
+* vaultssh -mode scpto -username ubuntu -localPath /tmp/source.txt  -remotePath /home/ubuntu/source.txt -sshServerHost infra1.foo.com
+
+## Example scp from usage:
+* vaultssh -mode scpfrom -username ubuntu -localPath /tmp/source2.txt  -remotePath /home/ubuntu/source.txt -sshServerHost infra1.foo.com
 
 ```
 Usage of vaultssh:
   -kvVersion int
     	vault kv verion (1 or 2) (default 1)
   -localPath string
-    	fully qualified path to local file to scp from
+    	fully qualified path to local file to scp to or from
   -mode string
     	one of: addkey | ssh | scpto | scpfrom (default "ssh")
   -passwd string
@@ -58,7 +61,7 @@ Usage of vaultssh:
   -publicKeyPath string
     	fully qualified path to ssh public key file
   -remotePath string
-    	fully qualified path to remote file to scp to
+    	fully qualified path to remote file to scp to or from
   -signingRole string
     	ssh client signing role (default "regular-role")
   -sshServerHost string

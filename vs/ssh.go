@@ -2,8 +2,6 @@ package vs
 
 import (
 	"bytes"
-	"strconv"
-	"strings"
 	"fmt"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
@@ -12,6 +10,8 @@ import (
 	"log"
 	"os"
 	"path"
+	"strconv"
+	"strings"
 )
 
 const (
@@ -35,7 +35,7 @@ func (vsConfig *VSConfig) copyFrom(session *ssh.Session) (err error) {
 	if err != nil {
 		return err
 	}
-	err = <- errchan
+	err = <-errchan
 	return err
 }
 
@@ -59,7 +59,7 @@ func (vsConfig *VSConfig) copyFromAux(session *ssh.Session, errchan chan error) 
 
 		if err1 == nil && err2 == nil {
 			fmt.Fprint(w, "\x00") // start the conversation - request the header
-			
+
 			buf := make([]byte, 1)
 			n, err := io.ReadFull(r, buf)
 			if err != nil {
@@ -197,7 +197,7 @@ func (vsConfig *VSConfig) copyTo(session *ssh.Session) (err error) {
 	if err != nil {
 		return err
 	}
-	err = <- errchan
+	err = <-errchan
 	return err
 }
 
@@ -210,7 +210,7 @@ func (vsConfig *VSConfig) copyToReader(session *ssh.Session, fileReader io.Reade
 	if err != nil {
 		return err
 	}
-	err = <- errchan
+	err = <-errchan
 	return err
 }
 
@@ -265,7 +265,6 @@ func (vsConfig *VSConfig) copyToAux(session *ssh.Session, r io.Reader, size int6
 		}
 		errchan <- nil
 	}()
-
 
 	directory := path.Dir(remote)
 	cmd := "/usr/bin/scp -qt " + directory
