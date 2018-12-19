@@ -33,4 +33,6 @@ $GOPATH/bin/vaultssh -mode scpfrom -sshServerPort 6061 -username ubuntu -passwd 
 ls -l ./vendor*.tar.gz
 sum ./vendor*.tar.gz
 
+$GOPATH/bin/vaultssh -mode ssh -sshServerPort 6061 -username ubuntu -passwd newpasswd -remoteCommand "ls -l"
+
 $GOPATH/bin/vaultssh -mode ssh -sshServerPort 6061 -username ubuntu -passwd newpasswd
