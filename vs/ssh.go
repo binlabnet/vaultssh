@@ -333,6 +333,18 @@ func (vsConfig *VSConfig) StartSessionAux() (err error) {
 	}
 	defer session.Close()
 
+	cmd := vsConfig.GetRemoteCommand()
+	if cmd != "" {
+		session.Stdout = os.Stdout
+		session.Stderr = os.Stderr
+		err = session.Run(cmd)
+		if err != nil {
+			msg := fmt.Sprintf("Remote command \"%s\" failed;  %+v", cmd, err)
+			log.Printf(msg)
+		}
+		return err
+	}
+
 	session.Stdout = os.Stdout
 	session.Stderr = os.Stderr
 	session.Stdin = os.Stdin

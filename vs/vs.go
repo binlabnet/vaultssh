@@ -16,6 +16,7 @@ var (
 )
 
 type VSConfig struct {
+	remoteCommand  string
 	localPath      string
 	remotePath     string
 	signingRole    string
@@ -89,12 +90,20 @@ func (vsConfig *VSConfig) SetPublicKeyPath(keypath string) {
 	vsConfig.publicKeyPath = keypath
 }
 
+func (vsConfig *VSConfig) SetLocalPath(localPath string) {
+	vsConfig.localPath = localPath
+}
+
 func (vsConfig *VSConfig) GetLocalPath() string {
 	return vsConfig.localPath
 }
 
-func (vsConfig *VSConfig) SetLocalPath(localpath string) {
-	vsConfig.localPath = localpath
+func (vsConfig *VSConfig) GetRemoteCommand() string {
+	return vsConfig.remoteCommand
+}
+
+func (vsConfig *VSConfig) SetRemoteCommand(remoteCommand string) {
+	vsConfig.remoteCommand = remoteCommand
 }
 
 func (vsConfig *VSConfig) GetRemotePath() string {
@@ -225,8 +234,9 @@ func NewVSConfig() *VSConfig {
 
 	vsConfig = new(VSConfig)
 
-	version := flag.Bool("v", false, "prints current version")
+	version := flag.Bool("v", false, "print current version and exit")
 	signingRole := flag.String("signingRole", "regular-role", "ssh client signing role")
+	remoteCommand := flag.String("remoteCommand", "", "remote command to execute")
 	mode := flag.String("mode", SSH, "one of: addkey | ssh | scpto | scpfrom")
 	localPath := flag.String("localPath", "", "fully qualified path to local file to scp to or from")
 	remotePath := flag.String("remotePath", "", "fully qualified path to remote file to scp to or from")
@@ -256,6 +266,7 @@ func NewVSConfig() *VSConfig {
 		log.Printf("Bad value for vaultAddress \"%s\"; %v\n", *vaultAddress, err)
 		os.Exit(1)
 	}
+	vsConfig.SetRemoteCommand(*remoteCommand)
 	vsConfig.SetLocalPath(*localPath)
 	vsConfig.SetRemotePath(*remotePath)
 	vsConfig.SetPublicKeyPath(*publicKeyPath)

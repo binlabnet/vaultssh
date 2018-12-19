@@ -42,16 +42,9 @@ func Addkey(vsapi VsApi) (exitcode int) {
 	}
 	SetPublicKey(vsapi, string(pubkey))
 
-	if GetPasswd(vsapi) == "" {
-		fmt.Printf("Enter vault userpass password: ")
-		bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
-		if err != nil {
-			msg := fmt.Sprintf("Unable to read pasword; %v\n", err)
-			log.Printf(msg)
-			exitcode = 6
-			return exitcode
-		}
-		SetPasswd(vsapi, string(bytePassword))
+	exitcode = interactivePassword(vsapi)
+	if exitcode != 0 {
+		return exitcode
 	}
 
 	err = AddKeyPair(vsapi)
@@ -69,6 +62,7 @@ func interactivePassword(vsapi VsApi) (exitcode int) {
 	if GetPasswd(vsapi) == "" {
 		fmt.Printf("Enter vault userpass password: ")
 		bytePassword, err := terminal.ReadPassword(int(syscall.Stdin))
+		fmt.Printf("\n")
 		if err != nil {
 			msg := fmt.Sprintf("Unable to read pasword; %v\n", err)
 			log.Printf(msg)
@@ -82,6 +76,9 @@ func interactivePassword(vsapi VsApi) (exitcode int) {
 
 func Scp(vsapi VsApi) (exitcode int) {
 	exitcode = interactivePassword(vsapi)
+	if exitcode != 0 {
+		return exitcode
+	}
 
 	err := ScpSession(vsapi)
 	if err != nil {
@@ -94,6 +91,9 @@ func Scp(vsapi VsApi) (exitcode int) {
 
 func Ssh(vsapi VsApi) (exitcode int) {
 	exitcode = interactivePassword(vsapi)
+	if exitcode != 0 {
+		return exitcode
+	}
 
 	err := StartSession(vsapi)
 	if err != nil {

@@ -59,6 +59,8 @@ Usage of vaultssh:
     	fully qualified path to ssh private key file
   -publicKeyPath string
     	fully qualified path to ssh public key file
+  -remoteCommand string
+    	remote command to execute
   -remotePath string
     	fully qualified path to remote file to scp to or from
   -signingRole string
@@ -73,7 +75,7 @@ Usage of vaultssh:
     	terminal type for session session (default "xterm-256color")
   -username string
     	username for vault auth (default "ubuntu")
-  -v	prints current version
+  -v	print current version and exit
   -vaultAddress string
     	vault address (default "http://localhost:8200")
 ```
@@ -85,7 +87,6 @@ Mozilla Public License, version 2.0
 * Test cases
 * More configurability - ssh and scp options
 * Support additional Vault user auth backends besides userpass
-* ssh remote commands
 * cli more like ssh, scp
 
 ### GitHubPages: https://richard-mauri.github.io/vaultssh/
