@@ -24,14 +24,14 @@ Here are the modes of operation:
 * This uses travis ci and goreleaser for builds and release respectively.
 
 ## Demo
-Show the scp to and from modes and the interactive ssh session
-[![asciicast](https://asciinema.org/a/217509.svg)](https://asciinema.org/a/217509)
+There is a demo.sh that invokes demo-build.sh and play.sh to build and use respectively.
+The following video is an example of the play.sh session
+[![asciicast](https://asciinema.org/a/217635.svg)](https://asciinema.org/a/217635)
 
 ## Usage
 There are a couple bash scripts under scripts/
 * configure.sh can be used to configure vault to enable userpass and signing. Run it after vault init.
 * adduser.sh can be used to create a vault userpass account and configure policies to be able to sign and ssh.
-In the future, these might become new modes of operation in the vaultssh client binary
 
 ## Example addkey usage (each user does this once; his vault password is prompted for)
 * vaultssh -mode addkey -publicKeyPath ~/.ssh/id_rsa.pub -privateKeyPath ~/.ssh/id_rsa -username ubuntu
