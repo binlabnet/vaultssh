@@ -24,9 +24,8 @@ Here are the modes of operation:
 * This uses travis ci and goreleaser for builds and release respectively.
 
 ## Demo
-The demo.sh starts a vault dev server, an ssh server, configures both, stores ssh keys and uses them to start a session.
-There is a lot of docker noise, wait for the end to see how easy vaultssh is to use
-[![asciicast](https://asciinema.org/a/216279.svg)](https://asciinema.org/a/216279)
+Show the scp to and from modes and the interactive ssh session
+[![asciicast](https://asciinema.org/a/217509.svg)](https://asciinema.org/a/217509)
 
 ## Usage
 There are a couple bash scripts under scripts/
