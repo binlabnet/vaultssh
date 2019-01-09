@@ -1,18 +1,13 @@
-VERSION=v0.1.3
-TAGDESC="Fourth release"
+VERSION=v0.1.4
+TAGDESC="Fifth release (go mod support)"
 BUILDTIME?=$$(date +%m-%d-%Y-%H:%M)
 VERSIONSTRING=${VERSION}-${BUILDTIME}
-GOFMT_FILES?=$$(find . -name '*.go' | grep -v vendor)
+GOFMT_FILES?=$$(find . -name '*.go')
+export GO111MODULE=on
 
 default: bin
 
-all: depends fmt bin test
-
-depends-hard:
-	dep ensure -update
-
-depends:
-	dep ensure
+all: fmt bin test
 
 bin:
 	go install -ldflags "-X github.com/richard-mauri/vaultssh/vs.VersionString=${VERSIONSTRING}"
@@ -27,4 +22,4 @@ release:
 	git tag -a ${VERSION} -m ${TAGDESC}
 	RELVERSION=${VERSIONSTRING} goreleaser 
 
-.PHONY: all bin default test fmt depends release depends-hard
+.PHONY: all bin default test fmt release

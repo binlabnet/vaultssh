@@ -3,7 +3,7 @@
 # Demonstrate secure interactive ssh session, ssh remote commands, scp to and scp from using vault ca signed ssh keys where all operations are performed in memory.
 
 PATH=$GOPATH/bin:$PATH
-SLEEP=1
+SLEEP=5
 
 function echomsg {
 	echo -e ${MSG}
@@ -47,27 +47,29 @@ sleep ${SLEEP}
 MSG="Ok, now let's create a tar file in preparation for the scpto demo that will follow"
 echomsg
 sleep ${SLEEP}
-(set -x; rm ./vendor*.tar.gz >& /dev/null)
-(set -x; tar czf ./vendor.tar.gz ./vendor)
-(set -x; ls -l ./vendor*.tar.gz)
-(set -x; sum ./vendor*.tar.gz)
+(set -x; rm ./vs*.tar.gz >& /dev/null)
+(set -x; tar czf ./vs.tar.gz ./vs)
+(set -x; ls -l ./vs*.tar.gz)
+(set -x; sum ./vs*.tar.gz)
 echoend
 sleep ${SLEEP}
 
 MSG="3. scpto: demonstrate how to copy a file to the remote host"
-CMD="vaultssh -mode scpto -sshServerPort 6061 -username ubuntu -passwd newpasswd -localPath ./vendor.tar.gz -remotePath /home/ubuntu/"
+CMD="vaultssh -mode scpto -sshServerPort 6061 -username ubuntu -passwd newpasswd -localPath ./vs.tar.gz -remotePath /home/ubuntu/"
 playstep
 
 MSG="4. scpfrom: demonstrate how to copy a file from the remote host"
-CMD="vaultssh -mode scpfrom -sshServerPort 6061 -username ubuntu -passwd newpasswd -localPath ./vendor2.tar.gz -remotePath /home/ubuntu/vendor.tar.gz"
+CMD="vaultssh -mode scpfrom -sshServerPort 6061 -username ubuntu -passwd newpasswd -localPath ./vs2.tar.gz -remotePath /home/ubuntu/vs.tar.gz"
 playstep
 
 MSG="Confirm that the original tar file is identical to the copy"
 echomsg
 sleep ${SLEEP}
-(set -x; ls -l ./vendor*.tar.gz; sum ./vendor*.tar.gz)
+(set -x; ls -l ./vs*.tar.gz; sum ./vs*.tar.gz)
 echoend
 sleep ${SLEEP}
+
+rm ./vs*.tar.gz >& /dev/null
 
 MSG="5. ssh interactive session demo"
 CMD="vaultssh -mode ssh -sshServerPort 6061 -username ubuntu -passwd newpasswd"

@@ -18,10 +18,11 @@ Here are the modes of operation:
 1. scpfrom: the user uses this mode to log into vault, sign his key and transfer files from a remote system
 
 ## Project Setup
-* The build and demo dependencies include: Go (go1.11.2), Docker (18.09.0), Git (2.18.0), dep (v0.5.0), vault (0.11.5)
-* Run "dep ensure" to populate vendor dependencies
-* Of course, make sure you have GOPATH defined and use "go install" to build.
-* This uses travis ci and goreleaser for builds and release respectively.
+* This uses "go mod" for build dependency management (go.11.4 is current and known to work ok)
+* Makefile is used to drive the go build commands
+* The GOPATH env variable must be defined so the installed vaultssh is installed under GOPATH/bin.
+* The runtime demo requires dependencies including (at least these versions;others may work): Go (go1.11.4), Docker (18.09.0), Git (2.18.0), vault (>= 0.11.5)
+* This project internally uses travis ci and goreleaser for CI builds and releases respectively.
 
 ## Demo
 There is a demo.sh that invokes demo-build.sh and play.sh to build and use respectively.
@@ -96,7 +97,7 @@ Mozilla Public License, version 2.0
 ### Releasing
 
 ### References links
-* https://golang.github.io/dep/
+* https://github.com/golang/go/wiki/Modules
 * https://godoc.org/github.com/hashicorp/vault/api
 * https://www.vaultproject.io/docs/secrets/ssh/signed-ssh-certificates.html
 * https://github.com/hashicorp/vault/blob/master/command/ssh.go
