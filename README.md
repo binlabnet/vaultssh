@@ -85,10 +85,9 @@ Usage of vaultssh:
 Mozilla Public License, version 2.0
 
 ## TODO
-* Test cases
-* More configurability - ssh and scp options
-* Support additional Vault user auth backends besides userpass
-* cli more like ssh, scp
+* Fill in stubbed-out test cases
+* More configurability
+* Support additional Vault authentication backends besides userpass
 
 ### GitHubPages: https://richard-mauri.github.io/vaultssh/
 
