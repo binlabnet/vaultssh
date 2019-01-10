@@ -94,8 +94,6 @@ Mozilla Public License, version 2.0
 
 ### CI Build: https://travis-ci.org/richard-mauri/vaultssh
 
-### Releasing
-
 ### References links
 * https://github.com/golang/go/wiki/Modules
 * https://godoc.org/github.com/hashicorp/vault/api
