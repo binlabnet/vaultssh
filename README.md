@@ -89,6 +89,12 @@ Mozilla Public License, version 2.0
 * More configurability
 * Support additional Vault authentication backends besides userpass
 
+## Server side Future?
+* Auditing reports of key, policy and session transcsripts including key logging
+* Monitoring and alerting
+* Key cleanup and rotation with declarative compliance policies
+* Consider implementing the feature as a vault server side plugins
+
 ### GitHubPages: https://richard-mauri.github.io/vaultssh/
 
 ### CI Build: https://travis-ci.org/richard-mauri/vaultssh
@@ -108,3 +114,5 @@ Mozilla Public License, version 2.0
 * https://asciinema.org/
 * https://docstore.mik.ua/orelly/networking_2ndEd/ssh/index.htm
 * https://docstore.mik.ua/orelly/networking_2ndEd/ssh/ch03_08.htm
+* https://www.ssh.com
+* https://www.vaultproject.io/docs/internals/plugins.html
