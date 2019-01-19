@@ -89,7 +89,7 @@ Mozilla Public License, version 2.0
 * More configurability
 * Support additional Vault authentication backends besides userpass
 
-## Server side Future?
+## Server side future?
 * Auditing reports of key, policy and session transcsripts including key logging
 * Monitoring and alerting
 * Key cleanup and rotation with declarative compliance policies
